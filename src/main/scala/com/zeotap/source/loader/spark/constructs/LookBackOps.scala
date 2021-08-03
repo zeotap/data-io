@@ -1,22 +1,11 @@
 package com.zeotap.source.loader.spark.constructs
 
-import com.zeotap.source.loader.spark.interpreters.SparkInterpreters.SparkReader
 import com.zeotap.source.loader.utils.DataPickupUtils
 import org.apache.hadoop.fs.FileSystem
-import org.apache.spark.sql.DataFrame
 
 import java.time.LocalDateTime
 
 object LookBackOps {
-
-  def lookBackProgram[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer): SparkReader[DataFrame] = {
-    val possiblePaths = getAllPossiblePaths(pathTemplate, parameters, lookBackWindow)
-    val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
-    val pathsToPick = getPathsToPick(possiblePaths, fileSystem)
-    for {
-      dataFrame <- SparkReaderOps.readMultiPath(pathsToPick)
-    } yield dataFrame
-  }
 
   def getLocalDateTimeFromStandardParameters(parameters: Map[String, String]): LocalDateTime = {
     val year = parameters("YR").toInt

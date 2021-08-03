@@ -4,7 +4,6 @@ import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.source.loader.spark.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
-import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types._
 import org.scalatest.FunSuite
 

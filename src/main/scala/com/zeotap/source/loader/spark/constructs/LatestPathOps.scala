@@ -1,10 +1,8 @@
 package com.zeotap.source.loader.spark.constructs
 
-import com.zeotap.source.loader.spark.interpreters.SparkInterpreters.SparkReader
 import com.zeotap.source.loader.utils.DataPickupUtils
 import org.apache.commons.lang.StringUtils
 import org.apache.hadoop.fs.{FileSystem, Path}
-import org.apache.spark.sql.DataFrame
 
 object LatestPathOps {
 
@@ -17,19 +15,10 @@ object LatestPathOps {
   val DATE_PARAMS = List("HR", "MIN", "YR", "MON", "DT")
   val SPARK_SUCCESS_TAG = "_SUCCESS"
 
-  def latestPathProgram[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): SparkReader[DataFrame] = {
-    val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
-    val pathsToPick = getPathsToPick(pathTemplate, fileSystem, parameters, relativeToCurrentDate)
-    for {
-      dataFrame <- SparkReaderOps.readMultiPath(pathsToPick)
-    } yield dataFrame
-  }
-
   def getPathsToPick(pathTemplate: String, fileSystem: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): List[String] =
     getAllLatestPaths(new Path(pathTemplate), fileSystem, parameters, relativeToCurrentDate)
 
   def getPathsForPattern(fs: FileSystem, pathPattern: String): Array[Path] = {
-
     // determine upto one depth if path is generated as a result of spark computation by checking for presence of success tags
     // if no such paths found, fallback to simple path listing for given input pattern
     val sparkPaths = fs.globStatus(new Path("%s/%s".format(pathPattern, SPARK_SUCCESS_TAG)))
@@ -41,11 +30,10 @@ object LatestPathOps {
   }
 
   def getAllLatestPaths(pathTemplate: Path, fs: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): List[String] = {
-
-    val wildcardedPathTemplate = DataPickupUtils.populatePathTemplateWithParameters(pathTemplate.toString,
+    val wildCardedPathTemplate = DataPickupUtils.populatePathTemplateWithParameters(pathTemplate.toString,
       List("DT", "MON", "YR", "MIN", "HR").map((_, WILDCARD_CHARACTER)).toMap
     )
-    val pathList = getPathsForPattern(fs, wildcardedPathTemplate)
+    val pathList = getPathsForPattern(fs, wildCardedPathTemplate)
     pathList.groupBy(path => getNonDateFields(path, pathTemplate)).mapValues(matchingPathList => {
       val referenceDatePath = DataPickupUtils.populatePathTemplateWithParameters(getDateFields(pathTemplate, pathTemplate),
         parameters)

@@ -5,7 +5,7 @@ import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.functions.col
 import org.scalatest.FunSuite
 
-object DataFrameUtils extends FunSuite with DataFrameSuiteBase{
+object DataFrameUtils extends FunSuite with DataFrameSuiteBase {
 
   def assertDataFrameEquality(expectedDf: DataFrame, actualDf: DataFrame, sortColumn: String): Unit = {
     val expectedColumns = expectedDf.columns.sorted.map(col)

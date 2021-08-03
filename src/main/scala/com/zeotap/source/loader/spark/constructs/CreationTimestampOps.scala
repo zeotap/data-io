@@ -1,16 +1,15 @@
 package com.zeotap.source.loader.spark.constructs
 
-import cats.data.Reader
 import com.zeotap.cloudstorageutils.CloudStorePathMetaGenerator
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
-import org.apache.spark.sql.functions.{col, input_file_name, udf, unix_timestamp}
+import org.apache.spark.sql.functions.{input_file_name, udf, unix_timestamp}
 import org.apache.spark.sql.types.StringType
 
 object CreationTimestampOps {
 
-  def addRawTimestampColumnFromInputFilePath(dataFrame: DataFrame): DataFrame = {
-    val pathTsMap = new CloudStorePathMetaGenerator().partFileRawTsMapGenerator(getPathsArray(dataFrame))
+  def addRawTimestampColumnFromInputFilePath(dataFrame: DataFrame)(implicit cloudStorePathMetaGenerator: CloudStorePathMetaGenerator = new CloudStorePathMetaGenerator()): DataFrame = {
+    val pathTsMap = cloudStorePathMetaGenerator.partFileRawTsMapGenerator(getPathsArray(dataFrame))
 
     val addRawTimestampColumn: UserDefinedFunction = udf((x: String) => {
       pathTsMap.get(x)

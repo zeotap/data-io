@@ -1,5 +1,6 @@
 package com.zeotap.source.loader.spark.constructs
 
+import com.zeotap.cloudstorageutils.CloudStorePathMetaGenerator
 import com.zeotap.source.loader.spark.constructs.CreationTimestampOps.addRawTimestampColumnFromInputFilePath
 import com.zeotap.source.loader.types.{DataType, OptionalColumn}
 import org.apache.spark.sql.DataFrame
@@ -18,7 +19,7 @@ object DataFrameOps {
       )
     }
 
-    def appendRawTsToDataFrame(inputType: String): DataFrame = {
+    def appendRawTsToDataFrame(inputType: String)(implicit cloudStorePathMetaGenerator: CloudStorePathMetaGenerator = new CloudStorePathMetaGenerator()): DataFrame = {
       inputType match {
         case "raw" => addRawTimestampColumnFromInputFilePath(dataFrame)
         case "preprocess" =>

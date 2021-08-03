@@ -3,8 +3,7 @@ package com.zeotap.source.loader.spark.interpreters
 import cats.arrow.FunctionK
 import cats.data.{Reader, State}
 import com.zeotap.source.loader.spark.constructs.DataFrameOps._
-import com.zeotap.source.loader.spark.constructs.LatestPathOps.latestPathProgram
-import com.zeotap.source.loader.spark.constructs.LookBackOps.lookBackProgram
+import com.zeotap.source.loader.spark.constructs.DataFrameReaderOps._
 import com.zeotap.source.loader.types.SupportedFeatures._
 import com.zeotap.source.loader.types._
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
@@ -39,8 +38,8 @@ object SparkInterpreters {
       val dataFrame: DataFrame = feature match {
         case LoadPath(path) => dataFrameReader.load(path)
         case Load() => dataFrameReader.load()
-        case LookBack(pathTemplate, parameters, lookBackWindow) => lookBackProgram(pathTemplate, parameters, lookBackWindow).run(dataFrameReader)
-        case LatestPath(pathTemplate, parameters, relativeToCurrentDate) => latestPathProgram(pathTemplate, parameters, relativeToCurrentDate).run(dataFrameReader)
+        case LookBack(pathTemplate, parameters, lookBackWindow) => dataFrameReader.lookBack(pathTemplate, parameters, lookBackWindow)
+        case LatestPath(pathTemplate, parameters, relativeToCurrentDate) => dataFrameReader.latestPath(pathTemplate, parameters, relativeToCurrentDate)
         case _ => dataFrameReader.load()
       }
       dataFrame.asInstanceOf[A]
