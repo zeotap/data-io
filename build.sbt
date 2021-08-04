@@ -33,6 +33,8 @@ parallelExecution in Test := false
 
 credentials += Credentials(new File(Path.userHome.absolutePath + "/.sbt/.credentials"))
 
+resolvers += "Artifactory Release" at "https://zeotap.jfrog.io/zeotap/libs-release"
+resolvers += "Artifactory Snapshot" at "https://zeotap.jfrog.io/zeotap/libs-snapshot"
 resolvers += Resolver.mavenLocal
 
 publishTo := {

@@ -2,7 +2,7 @@ package com.zeotap.source.loader.spark.loaders
 
 import com.zeotap.source.loader.types.SupportedFeaturesF.DataSourceLoader
 import com.zeotap.source.loader.types.{SupportedFeaturesF, TEXT}
-import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
+import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 case class TextSparkLoader(
   readerProperties: Seq[DataSourceLoader[DataFrameReader]] = Seq(SupportedFeaturesF.addFormat(TEXT)),

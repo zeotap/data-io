@@ -49,7 +49,7 @@ object SparkInterpreters {
   val dataFrameInterpreter: FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
     override def apply[A](feature: SupportedFeatures[A]): SparkDataFrame[A] = State { sparkDataFrame =>
       val dataFrame: DataFrame = feature match {
-        case OptionalColumns(columns) => sparkDataFrame.optionalColumns(columns)
+        case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
         case AddCreationTimestamp(inputType) => sparkDataFrame.appendRawTsToDataFrame(inputType)
         case _ => sparkDataFrame
       }

@@ -36,7 +36,7 @@ object SupportedFeaturesF {
 
   def latestPath[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): DataSourceLoader[A] = liftF(LatestPath[A](pathTemplate, parameters, relativeToCurrentDate))
 
-  def optionalColumns[A](columns: List[OptionalColumn]): DataSourceLoader[A] = liftF(OptionalColumns[A](columns))
+  def addOptionalColumns[A](columns: List[OptionalColumn]): DataSourceLoader[A] = liftF(AddOptionalColumns[A](columns))
 
   def addCreationTimestamp[A](inputType: String): DataSourceLoader[A] = liftF(AddCreationTimestamp[A](inputType))
 

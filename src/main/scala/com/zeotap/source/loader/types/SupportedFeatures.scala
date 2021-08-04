@@ -40,7 +40,7 @@ object SupportedFeatures {
   final case class LatestPath[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
 
   // DataFrame-specific features
-  final case class OptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]
+  final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]
 
   // FS DataFrame-specific features
   final case class AddCreationTimestamp[A](inputType: String) extends SupportedFeatures[A]

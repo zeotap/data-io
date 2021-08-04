@@ -44,7 +44,7 @@ class OptionalColumnOpsTest extends FunSuite with DataFrameSuiteBase {
   test("no optional columns provided") {
     val dataFrame = spark.read.format("avro").load(inputAvroPath)
     import com.zeotap.source.loader.spark.constructs.DataFrameOps._
-    val actualDataFrame = dataFrame.optionalColumns(List())
+    val actualDataFrame = dataFrame.addOptionalColumns(List())
 
     assertDataFrameEquals(dataFrame, actualDataFrame)
   }
@@ -56,7 +56,7 @@ class OptionalColumnOpsTest extends FunSuite with DataFrameSuiteBase {
       OptionalColumn("DeviceId", null, STRING)
     )
     import com.zeotap.source.loader.spark.constructs.DataFrameOps._
-    val actualDataFrame = dataFrame.optionalColumns(optionalColumns)
+    val actualDataFrame = dataFrame.addOptionalColumns(optionalColumns)
 
     assertDataFrameEquals(dataFrame, actualDataFrame)
   }
@@ -69,7 +69,7 @@ class OptionalColumnOpsTest extends FunSuite with DataFrameSuiteBase {
       OptionalColumn("New_Column3", "10", INT)
     )
     import com.zeotap.source.loader.spark.constructs.DataFrameOps._
-    val actualDataFrame = dataFrame.optionalColumns(optionalColumns)
+    val actualDataFrame = dataFrame.addOptionalColumns(optionalColumns)
 
     val expectedSchema = List(
       StructField("Common_DataPartnerID", IntegerType, true),

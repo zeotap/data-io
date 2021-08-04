@@ -96,7 +96,8 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
 
     val expectedInputPathsArray = Array("src/test/resources/custom-input-format/yr=2021/mon=07/dt=19/",
       "src/test/resources/custom-input-format/yr=2021/mon=07/dt=18/")
-    val actualInputPathsArray = CreationTimestampOps.getPathsArray(dataFrame).map(x => "src" + x.split("/src")(1))
+    import com.zeotap.source.loader.spark.constructs.DataFrameOps._
+    val actualInputPathsArray = dataFrame.getPathsArray.map(x => "src" + x.split("/src")(1))
 
     assert(expectedInputPathsArray.sorted.sameElements(actualInputPathsArray.sorted))
   }
@@ -124,13 +125,14 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
 
     val cloudStorePathMetaGenerator = mock[CloudStorePathMetaGenerator]
 
-    val inputPathsArray = CreationTimestampOps.getPathsArray(dataFrame)
+    import com.zeotap.source.loader.spark.constructs.DataFrameOps._
+    val inputPathsArray = dataFrame.getPathsArray
     val pathTsMap: Map[String, String] = dataFrame.withColumn("inputPath", input_file_name())
       .select("inputPath").distinct().collect.map(row => row.getString(0))
       .flatMap(x => Map(x -> "2021-08-03 00:00")).toMap
 
     Mockito.when(cloudStorePathMetaGenerator.partFileRawTsMapGenerator(inputPathsArray)).thenReturn(pathTsMap)
-    val actualDataFrame = CreationTimestampOps.addRawTimestampColumnFromInputFilePath(dataFrame)(cloudStorePathMetaGenerator)
+    val actualDataFrame = dataFrame.addRawTimestampColumnFromInputFilePath(cloudStorePathMetaGenerator)
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
@@ -158,7 +160,8 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
 
     val cloudStorePathMetaGenerator = mock[CloudStorePathMetaGenerator]
 
-    val inputPathsArray = CreationTimestampOps.getPathsArray(dataFrame)
+    import com.zeotap.source.loader.spark.constructs.DataFrameOps._
+    val inputPathsArray = dataFrame.getPathsArray
     val pathTsMap: Map[String, String] = dataFrame.withColumn("inputPath", input_file_name())
       .select("inputPath").distinct().collect.map(row => row.getString(0))
       .flatMap(x => Map(x -> "2021-08-03 00:00")).toMap

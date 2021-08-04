@@ -47,7 +47,6 @@ object LatestPathOps {
         else EMPTY_STRING
       }
     }).values.filter(StringUtils.isNotEmpty).toList
-
   }
 
   def getDateFields(path: Path, pathTemplate: Path): String = {

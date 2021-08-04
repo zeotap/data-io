@@ -192,7 +192,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = new FSSparkLoader()
       .addFormat(AVRO)
       .load(inputAvroPath1)
-      .optionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
+      .addOptionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
       .build(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
@@ -221,8 +221,8 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = new FSSparkLoader()
       .addFormat(AVRO)
       .load(inputAvroPath1)
-      .optionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
-      .optionalColumns(List(OptionalColumn("New_Column2", "5678", INT)))
+      .addOptionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
+      .addOptionalColumns(List(OptionalColumn("New_Column2", "5678", INT)))
       .build(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
