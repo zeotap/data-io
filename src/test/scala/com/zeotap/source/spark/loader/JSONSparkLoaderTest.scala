@@ -82,7 +82,7 @@ class JSONSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val df = JSONSparkLoader()
       .load(inputJsonPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -108,7 +108,7 @@ class JSONSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = JSONSparkLoader()
       .multiLine
       .load(inputJsonPath2)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }

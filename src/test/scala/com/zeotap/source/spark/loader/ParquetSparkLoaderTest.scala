@@ -82,7 +82,7 @@ class ParquetSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val df = ParquetSparkLoader()
       .load(inputParquetPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -117,7 +117,7 @@ class ParquetSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = ParquetSparkLoader()
       .mergeSchema
       .load("src/test/resources/custom-input-format/yr=2021/mon=07")
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df,  "DeviceId")
   }

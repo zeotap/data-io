@@ -9,7 +9,7 @@ import org.apache.spark.sql.types.StringType
 
 object DataFrameOps {
 
-  implicit class DataFrameOps(dataFrame: DataFrame) {
+  implicit class DataFrameExt(dataFrame: DataFrame) {
 
     def addOptionalColumns(columns: List[OptionalColumn]): DataFrame = {
       val dataFrameColumns = dataFrame.columns
@@ -22,7 +22,9 @@ object DataFrameOps {
 
     def appendRawTsToDataFrame(inputType: String)(implicit cloudStorePathMetaGenerator: CloudStorePathMetaGenerator = new CloudStorePathMetaGenerator()): DataFrame = {
       inputType match {
-        case "raw" => dataFrame.addRawTimestampColumnFromInputFilePath
+        case "raw" =>
+          if (dataFrame.columns.contains("CREATED_TS_raw")) throw new IllegalStateException("CREATED_TS_raw column already exists")
+          else dataFrame.addRawTimestampColumnFromInputFilePath
         case "preprocess" =>
           if (dataFrame.columns.contains("CREATED_TS_raw")) dataFrame
           else throw new NoSuchElementException("there is no CREATED_TS_raw column in the transform input")

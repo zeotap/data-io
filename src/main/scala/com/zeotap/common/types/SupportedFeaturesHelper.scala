@@ -4,9 +4,11 @@ import cats.free.Free
 import cats.free.Free.liftF
 import com.zeotap.common.types.SupportedFeatures._
 
-object SupportedFeaturesF {
+object SupportedFeaturesHelper {
 
   type SupportedFeaturesF[A] = Free[SupportedFeatures, A]
+
+  def schema[A](schema: String): SupportedFeaturesF[A] = liftF(Schema[A](schema))
 
   def addFormat[A](datatype: DataFormatType): SupportedFeaturesF[A] = liftF(FormatType[A](datatype))
 
@@ -31,6 +33,8 @@ object SupportedFeaturesF {
   def load[A](): SupportedFeaturesF[A] = liftF(Load[A]())
 
   def loadPath[A](path: String): SupportedFeaturesF[A] = liftF(LoadPath[A](path))
+
+  def loadPaths[A](paths: List[String]): SupportedFeaturesF[A] = liftF(LoadPaths[A](paths))
 
   def lookBack[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer): SupportedFeaturesF[A] = liftF(LookBack[A](pathTemplate, parameters, lookBackWindow))
 

@@ -105,7 +105,7 @@ class AvroSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val df = AvroSparkLoader()
       .load(inputAvroPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -166,7 +166,7 @@ class AvroSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = AvroSparkLoader()
       .avroSchema(schema)
       .load(inputAvroPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -219,7 +219,7 @@ class AvroSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = AvroSparkLoader()
       .avroSchema(new ObjectMapper().readTree(schema))
       .load(inputAvroPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }

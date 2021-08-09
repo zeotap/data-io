@@ -1,6 +1,6 @@
 package com.zeotap.common.constructs
 
-import com.zeotap.common.types.SupportedFeaturesF.SupportedFeaturesF
+import com.zeotap.common.types.SupportedFeaturesHelper.SupportedFeaturesF
 
 object SupportedFeatureOps {
 

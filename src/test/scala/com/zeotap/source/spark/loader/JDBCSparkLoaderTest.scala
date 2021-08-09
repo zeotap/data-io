@@ -62,7 +62,7 @@ class JDBCSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = JDBCSparkLoader()
       .connectionProperties(dbUrl, dbUserName, dbPassword, "test_table")
       .load()
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "id")
     container.stop()
@@ -107,7 +107,7 @@ class JDBCSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       .customSchema("id string, name string")
       .connectionProperties(dbUrl, dbUserName, dbPassword, "test_table")
       .load()
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "id")
     container.stop()

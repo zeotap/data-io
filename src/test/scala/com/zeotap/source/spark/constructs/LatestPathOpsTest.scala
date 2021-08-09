@@ -165,6 +165,7 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     val expectedDataFrame = spark.read.format("avro").load(inputAvroPath3)
     import com.zeotap.source.spark.constructs.DataFrameReaderOps._
     val actualDataFrame = spark.read.format("avro").latestPath(fullPathTemplate, parameters, true)
+    spark.read.format("avro")
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }

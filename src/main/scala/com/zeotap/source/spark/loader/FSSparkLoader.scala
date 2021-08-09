@@ -1,7 +1,7 @@
 package com.zeotap.source.spark.loader
 
-import com.zeotap.common.types.SupportedFeaturesF.SupportedFeaturesF
-import com.zeotap.common.types.{DataFormatType, OptionalColumn, SupportedFeaturesF}
+import com.zeotap.common.types.SupportedFeaturesHelper.SupportedFeaturesF
+import com.zeotap.common.types.{DataFormatType, OptionalColumn, SupportedFeaturesHelper}
 import com.zeotap.common.utils.CommonUtils.handleException
 import com.zeotap.source.utils.SparkLoaderUtils
 import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
@@ -13,31 +13,45 @@ class FSSparkLoader(
 ) {
 
   /**
+   * Provides custom schema to the Spark DataFrameReader
+   * @param jsonSchema The StructType schema needs to be provided as a jsonString (jsonSchema = schema.json)
+   */
+  def schema(jsonSchema: String): FSSparkLoader =
+    new FSSparkLoader(readerProperties :+ SupportedFeaturesHelper.schema(jsonSchema), readerToDataFrameProperties, dataFrameProperties)
+
+  /**
    * Adds the input format to the Spark DataFrameReader
    * @param format Supported formats = {TEXT, CSV, JSON, AVRO, PARQUET, ORC}
    */
   def addFormat(format: DataFormatType): FSSparkLoader =
-    new FSSparkLoader(readerProperties :+ SupportedFeaturesF.addFormat(format), readerToDataFrameProperties, dataFrameProperties)
+    new FSSparkLoader(readerProperties :+ SupportedFeaturesHelper.addFormat(format), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Sets the base path that is needed for partition discovery
    */
   def basePath(path: String): FSSparkLoader =
-    new FSSparkLoader(readerProperties :+ SupportedFeaturesF.basePath(path), dataFrameProperties)
+    new FSSparkLoader(readerProperties :+ SupportedFeaturesHelper.basePath(path), dataFrameProperties)
 
   /**
    * Loads input in as a `DataFrame`, for data sources that don't require a path (e.g. external
    * key-value stores).
    */
   def load(): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesF.load(), dataFrameProperties)
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.load(), dataFrameProperties)
 
   /**
    * Loads input in as a `DataFrame`, for data sources that require a path (e.g. data backed by
    * a local or distributed file system).
    */
   def load(path: String): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesF.loadPath(path), dataFrameProperties)
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.loadPath(path), dataFrameProperties)
+
+  /**
+   * Loads input from multiple paths as a single `DataFrame`, for data sources that require a path (e.g. data backed by
+   * a local or distributed file system).
+   */
+  def load(paths: List[String]): FSSparkLoader =
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.loadPaths(paths), dataFrameProperties)
 
   /**
    * Look-back operation performed to obtain all available paths before the given date and within the lookBackWindow.
@@ -46,7 +60,7 @@ class FSSparkLoader(
    * @param pathTemplate Example: gs://bucket/path/yr=${YR}/mon=${MON}/dt=${DT}
    */
   def lookBack(pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesF.lookBack(pathTemplate, parameters, lookBackWindow), dataFrameProperties)
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.lookBack(pathTemplate, parameters, lookBackWindow), dataFrameProperties)
 
   /**
    * The latest path with respect to the given date is obtained and loaded into a `DataFrame`.
@@ -56,7 +70,7 @@ class FSSparkLoader(
    * @param pathTemplate Example: gs://bucket/path/yr=${YR}/mon=${MON}/dt=${DT}
    */
   def latestPath(pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesF.latestPath(pathTemplate, parameters, relativeToCurrentDate), dataFrameProperties)
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.latestPath(pathTemplate, parameters, relativeToCurrentDate), dataFrameProperties)
 
   /**
    * Only if a provided column does not exist in the DataFrame, it will be added with the provided defaultValue.
@@ -65,7 +79,7 @@ class FSSparkLoader(
    * Supported dataTypes = {STRING, BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, DECIMAL, DATE, TIMESTAMP}
    */
   def addOptionalColumns(columns: List[OptionalColumn]): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesF.addOptionalColumns(columns))
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addOptionalColumns(columns))
 
   /**
    * Adds a column `CREATED_TS_raw` based on the provided inputType
@@ -75,18 +89,18 @@ class FSSparkLoader(
    * case `preprocess` => Preprocessed data (CREATED_TS_raw column is expected to be present in the inputData)
    */
   def addCreationTimestamp(inputType: String): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesF.addCreationTimestamp(inputType))
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addCreationTimestamp(inputType))
 
   /**
    * Returns a `DataFrame` based on all the provided reader and dataFrame properties
    */
-  def build(implicit spark: SparkSession): DataFrame =
+  def buildUnsafe(implicit spark: SparkSession): DataFrame =
     SparkLoaderUtils.buildLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Exception-safe build function to return either exception message or `DataFrame`
    */
-  def buildWithExceptionHandling(implicit spark: SparkSession): Either[String, DataFrame] = handleException(build)
+  def buildSafe(implicit spark: SparkSession): Either[String, DataFrame] = handleException(buildUnsafe)
 
 }
 

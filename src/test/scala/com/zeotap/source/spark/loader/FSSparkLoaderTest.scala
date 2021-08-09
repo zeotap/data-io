@@ -109,7 +109,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = new FSSparkLoader()
       .addFormat(ORC)
       .load(inputOrcPath)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -139,7 +139,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = new FSSparkLoader()
       .addFormat(AVRO)
       .lookBack("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "19"), 3)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -165,7 +165,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = new FSSparkLoader()
       .addFormat(AVRO)
       .latestPath("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "17"), false)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -193,7 +193,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       .addFormat(AVRO)
       .load(inputAvroPath1)
       .addOptionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
@@ -223,7 +223,42 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       .load(inputAvroPath1)
       .addOptionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
       .addOptionalColumns(List(OptionalColumn("New_Column2", "5678", INT)))
-      .build(spark)
+      .buildUnsafe(spark)
+
+    assertDataFrameEquality(expectedDf, df, "DeviceId")
+  }
+
+  test("testForMultiPathsWithCustomSchema") {
+    val schema = StructType(
+      List(
+        StructField("Common_DataPartnerID", IntegerType, true),
+        StructField("DeviceId", StringType, true),
+        StructField("Demographic_Country", StringType, true),
+        StructField("Common_TS", StringType, true)
+      )
+    )
+
+    val schemaJson = schema.json
+
+    val expectedDf = spark.createDataFrame(
+      spark.sparkContext.parallelize(Seq(
+        Row(1,"1","India","1504679559"),
+        Row(1,"2","India","1504679359"),
+        Row(1,"3","Spain","1504679459"),
+        Row(1,"4","India","1504679659"),
+        Row(1,"5","France","1504679559"),
+        Row(1,"6","Germany","1504679359"),
+        Row(1,"7","Italy","1504679459"),
+        Row(1,"8","Belgium","1504679659")
+      )),
+      schema
+    )
+
+    val df = new FSSparkLoader()
+      .addFormat(AVRO)
+      .schema(schemaJson)
+      .load(List(inputAvroPath1, inputAvroPath2, inputAvroPath3))
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }

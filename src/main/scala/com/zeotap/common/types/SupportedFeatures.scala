@@ -4,6 +4,9 @@ sealed trait SupportedFeatures[A]
 
 object SupportedFeatures {
 
+  // Reader-specific features
+  final case class Schema[A](schema: String) extends SupportedFeatures[A]
+
   // FS Reader-specific features
   final case class FormatType[A](format: DataFormatType) extends SupportedFeatures[A]
 
@@ -34,6 +37,8 @@ object SupportedFeatures {
   final case class Load[A]() extends SupportedFeatures[A]
 
   final case class LoadPath[A](path: String) extends SupportedFeatures[A]
+
+  final case class LoadPaths[A](paths: List[String]) extends SupportedFeatures[A]
 
   final case class LookBack[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer) extends SupportedFeatures[A]
 

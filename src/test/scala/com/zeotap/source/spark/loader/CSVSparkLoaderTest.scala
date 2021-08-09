@@ -77,7 +77,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val df = CSVSparkLoader()
       .load(inputCSVPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "_c0")
   }
@@ -102,7 +102,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = CSVSparkLoader()
       .inferSchema
       .load(inputCSVPath1)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "_c0")
   }
@@ -127,7 +127,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = CSVSparkLoader()
       .separator(".")
       .load(inputCSVPath2)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "_c0")
   }
@@ -152,7 +152,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = CSVSparkLoader()
       .header
       .load(inputCSVPath3)
-      .build(spark)
+      .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "column1")
   }

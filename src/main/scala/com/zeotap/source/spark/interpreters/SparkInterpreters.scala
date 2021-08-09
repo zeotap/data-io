@@ -6,6 +6,7 @@ import com.zeotap.common.types.SupportedFeatures._
 import com.zeotap.common.types.{DataFormatType, SupportedFeatures}
 import com.zeotap.source.spark.constructs.DataFrameOps._
 import com.zeotap.source.spark.constructs.DataFrameReaderOps._
+import org.apache.spark.sql.types.{DataType, StructType}
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 object SparkInterpreters {
@@ -17,6 +18,7 @@ object SparkInterpreters {
   val readerInterpreter: FunctionK[SupportedFeatures, SparkReader] = new FunctionK[SupportedFeatures, SparkReader] {
     override def apply[A](feature: SupportedFeatures[A]): SparkReader[A] = Reader { dataFrameReader =>
       val reader: DataFrameReader = feature match {
+        case Schema(schema) => dataFrameReader.schema(DataType.fromJson(schema).asInstanceOf[StructType])
         case FormatType(format) => dataFrameReader.format(DataFormatType.value(format))
         case BasePath(path) => dataFrameReader.option("basePath", path)
         case Separator(separator) => dataFrameReader.option("sep", separator)
@@ -36,8 +38,9 @@ object SparkInterpreters {
   val readerToDataFrameInterpreter: FunctionK[SupportedFeatures, SparkReader] = new FunctionK[SupportedFeatures, SparkReader] {
     override def apply[A](feature: SupportedFeatures[A]): SparkReader[A] = Reader { dataFrameReader =>
       val dataFrame: DataFrame = feature match {
-        case LoadPath(path) => dataFrameReader.load(path)
         case Load() => dataFrameReader.load()
+        case LoadPath(path) => dataFrameReader.load(path)
+        case LoadPaths(paths) => dataFrameReader.load(paths : _*)
         case LookBack(pathTemplate, parameters, lookBackWindow) => dataFrameReader.lookBack(pathTemplate, parameters, lookBackWindow)
         case LatestPath(pathTemplate, parameters, relativeToCurrentDate) => dataFrameReader.latestPath(pathTemplate, parameters, relativeToCurrentDate)
         case _ => dataFrameReader.load()

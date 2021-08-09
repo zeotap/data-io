@@ -173,6 +173,29 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
 
+  test("appendRawTsToDataFrameTest(inputType = raw) when dataFrame already has CREATED_TS_raw column") {
+    val schema = List(
+      StructField("Common_DataPartnerID", IntegerType, true),
+      StructField("DeviceId", StringType, true),
+      StructField("Demographic_Country", StringType, true),
+      StructField("Common_TS", StringType, true),
+      StructField("CREATED_TS_raw", StringType, true)
+    )
+
+    val dataFrame = spark.createDataFrame(
+      spark.sparkContext.parallelize(Seq(
+        Row(1,"1","India","1504679559","1627929000"),
+        Row(1,"2","India","1504679359","1627929000"),
+        Row(1,"3","Spain","1504679459","1627929000"),
+        Row(1,"4","India","1504679659","1627929000")
+      )),
+      StructType(schema)
+    )
+
+    import com.zeotap.source.spark.constructs.DataFrameOps._
+    assertThrows[IllegalStateException](dataFrame.appendRawTsToDataFrame("raw"))
+  }
+
   test("vanilla appendRawTsToDataFrameTest(inputType = preprocess)") {
     val schema = List(
       StructField("Common_DataPartnerID", IntegerType, true),
