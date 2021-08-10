@@ -82,14 +82,13 @@ class FSSparkLoader(
     new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addOptionalColumns(columns))
 
   /**
-   * Adds a column `CREATED_TS_raw` based on the provided inputType
-   * @param inputType needs to be one of `raw`, `tube`, `preprocess`
-   * case `raw` => GCS flat files (CREATED_TS_raw calculated from the part files' create TS)
-   * case `tube` => SmartPixel/Tube data (Existing timestamp column value used for CREATED_TS_raw)
-   * case `preprocess` => Preprocessed data (CREATED_TS_raw column is expected to be present in the inputData)
+   * Adds a column based on the provided operation
+   * @param operation needs to be one of `addColumn`, `renameColumn`
+   * case `addColumn` => outputTsColumn calculated from the flat files' create TS
+   * case `renameColumn` => existing timestamp column value used for outputTsColumn
    */
-  def addCreationTimestamp(inputType: String): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addCreationTimestamp(inputType))
+  def addCreationTimestamp(operation: String, inputColumn: Option[String], outputColumn: String): FSSparkLoader =
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addCreationTimestamp(operation, inputColumn, outputColumn))
 
   /**
    * Returns a `DataFrame` based on all the provided reader and dataFrame properties

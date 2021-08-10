@@ -15,9 +15,6 @@ object LatestPathOps {
   val DATE_PARAMS = List("HR", "MIN", "YR", "MON", "DT")
   val SPARK_SUCCESS_TAG = "_SUCCESS"
 
-  def getPathsToPick(pathTemplate: String, fileSystem: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): List[String] =
-    getAllLatestPaths(new Path(pathTemplate), fileSystem, parameters, relativeToCurrentDate)
-
   def getPathsForPattern(fs: FileSystem, pathPattern: String): Array[Path] = {
     // determine upto one depth if path is generated as a result of spark computation by checking for presence of success tags
     // if no such paths found, fallback to simple path listing for given input pattern
@@ -29,7 +26,7 @@ object LatestPathOps {
       sparkPaths
   }
 
-  def getAllLatestPaths(pathTemplate: Path, fs: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): List[String] = {
+  def getLatestPath(pathTemplate: Path, fs: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): String = {
     val wildCardedPathTemplate = DataPickupUtils.populatePathTemplateWithParameters(pathTemplate.toString,
       List("DT", "MON", "YR", "MIN", "HR").map((_, WILDCARD_CHARACTER)).toMap
     )
@@ -46,7 +43,7 @@ object LatestPathOps {
           matchingPathList.map(_.toString).max
         else EMPTY_STRING
       }
-    }).values.filter(StringUtils.isNotEmpty).toList
+    }).values.filter(StringUtils.isNotEmpty).head
   }
 
   def getDateFields(path: Path, pathTemplate: Path): String = {

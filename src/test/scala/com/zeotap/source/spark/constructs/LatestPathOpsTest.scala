@@ -100,17 +100,16 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     assert(actualNonDateFields.equals("src/test/resources/custom-input-format"))
   }
 
-  test("getAllLatestPaths relativeToCurrentDate = true") {
+  test("getLatestPath relativeToCurrentDate = true") {
     val pathTemplate = "src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}"
     val fullPathTemplate = "file:" + new File(pathTemplate).getAbsolutePath
-    println(fullPathTemplate)
     val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
     val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
 
-    val expectedLatestPaths = List("src/test/resources/custom-input-format/yr=2021/mon=07/dt=17")
-    val actualLatestPaths = LatestPathOps.getAllLatestPaths(new Path(fullPathTemplate), fileSystem, parameters, true).map(x => "src" + x.split("src")(1))
+    val expectedLatestPath = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=17"
+    val actualLatestPath = "src" + LatestPathOps.getLatestPath(new Path(fullPathTemplate), fileSystem, parameters, true).split("src")(1)
 
-    assert(expectedLatestPaths == actualLatestPaths)
+    assert(expectedLatestPath == actualLatestPath)
   }
 
   test("getAllLatestPaths relativeToCurrentDate = false") {
@@ -119,10 +118,10 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
     val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
 
-    val expectedLatestPaths = List("src/test/resources/custom-input-format/yr=2021/mon=07/dt=19")
-    val actualLatestPaths = LatestPathOps.getAllLatestPaths(new Path(fullPathTemplate), fileSystem, parameters, false).map(x => "src" + x.split("src")(1))
+    val expectedLatestPath = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=19"
+    val actualLatestPath = "src" + LatestPathOps.getLatestPath(new Path(fullPathTemplate), fileSystem, parameters, false).split("src")(1)
 
-    assert(expectedLatestPaths == actualLatestPaths)
+    assert(expectedLatestPath == actualLatestPath)
   }
 
   test("getPathsForPattern") {

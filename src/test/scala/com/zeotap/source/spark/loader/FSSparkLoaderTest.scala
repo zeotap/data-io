@@ -119,19 +119,24 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructField("Common_DataPartnerID", IntegerType, true),
       StructField("DeviceId", StringType, true),
       StructField("Demographic_Country", StringType, true),
-      StructField("Common_TS", StringType, true)
+      StructField("Common_TS", StringType, true),
+      StructField("Demographic_Gender", StringType, true)
     )
 
     val expectedDf = spark.createDataFrame(
       spark.sparkContext.parallelize(Seq(
-        Row(1,"1","India","1504679559"),
-        Row(1,"2","India","1504679359"),
-        Row(1,"3","Spain","1504679459"),
-        Row(1,"4","India","1504679659"),
-        Row(1,"5","France","1504679559"),
-        Row(1,"6","Germany","1504679359"),
-        Row(1,"7","Italy","1504679459"),
-        Row(1,"8","Belgium","1504679659")
+        Row(1,"1","India","1504679559",null),
+        Row(1,"2","India","1504679359",null),
+        Row(1,"3","Spain","1504679459",null),
+        Row(1,"4","India","1504679659",null),
+        Row(1,"5","France","1504679559",null),
+        Row(1,"6","Germany","1504679359",null),
+        Row(1,"7","Italy","1504679459",null),
+        Row(1,"8","Belgium","1504679659",null),
+        Row(1,"5","France","1504679559","Male"),
+        Row(1,"6","Germany","1504679359","Female"),
+        Row(1,"7","Italy","1504679459","Female"),
+        Row(1,"8","Belgium","1504679659","Male")
       )),
       StructType(expectedSchema)
     )

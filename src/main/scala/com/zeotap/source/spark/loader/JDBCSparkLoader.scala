@@ -15,8 +15,20 @@ case class JDBCSparkLoader(
   /**
    * This function can be used to provide all the options required by Spark to read from JDBC
    */
-  def connectionProperties(url: String, user: String, password: String, tableName: String): JDBCSparkLoader =
-    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.connectionProperties(url, user, password, tableName), readerToDataFrameProperties, dataFrameProperties)
+  def connectionProperties(url: String, user: String, password: String): JDBCSparkLoader =
+    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.connectionProperties(url, user, password), readerToDataFrameProperties, dataFrameProperties)
+
+  /**
+   * Provides the tableName required by Spark to read from JDBC. Cannot be used along with query
+   */
+  def tableName(tableName: String): JDBCSparkLoader =
+    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.tableName(tableName), readerToDataFrameProperties, dataFrameProperties)
+
+  /**
+   * Provides a custom query to Spark for loading from JDBC. Example: "select c1, c2 from t1". Cannot be used along with tableName
+   */
+  def query(query: String): JDBCSparkLoader =
+    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.query(query), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * The custom schema to use for reading data from JDBC connectors. For example, "id DECIMAL(38, 0), name STRING".

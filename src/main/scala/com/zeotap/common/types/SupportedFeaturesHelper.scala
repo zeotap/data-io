@@ -26,7 +26,11 @@ object SupportedFeaturesHelper {
 
   def mergeSchema[A]: SupportedFeaturesF[A] = liftF(MergeSchema[A]())
 
-  def connectionProperties[A](url: String, user: String, password: String, tableName: String): SupportedFeaturesF[A] = liftF(ConnectionProperties[A](url, user, password, tableName))
+  def connectionProperties[A](url: String, user: String, password: String): SupportedFeaturesF[A] = liftF(ConnectionProperties[A](url, user, password))
+
+  def tableName[A](tableName: String): SupportedFeaturesF[A] = liftF(TableName[A](tableName))
+
+  def query[A](query: String): SupportedFeaturesF[A] = liftF(Query[A](query))
 
   def customSchema[A](schema: String): SupportedFeaturesF[A] = liftF(CustomSchema[A](schema))
 
@@ -42,6 +46,6 @@ object SupportedFeaturesHelper {
 
   def addOptionalColumns[A](columns: List[OptionalColumn]): SupportedFeaturesF[A] = liftF(AddOptionalColumns[A](columns))
 
-  def addCreationTimestamp[A](inputType: String): SupportedFeaturesF[A] = liftF(AddCreationTimestamp[A](inputType))
+  def addCreationTimestamp[A](operation: String, inputColumn: Option[String], outputColumn: String): SupportedFeaturesF[A] = liftF(AddCreationTimestamp[A](operation, inputColumn, outputColumn))
 
 }

@@ -132,12 +132,12 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
       .flatMap(x => Map(x -> "2021-08-03 00:00")).toMap
 
     Mockito.when(cloudStorePathMetaGenerator.partFileRawTsMapGenerator(inputPathsArray)).thenReturn(pathTsMap)
-    val actualDataFrame = dataFrame.addRawTimestampColumnFromInputFilePath(cloudStorePathMetaGenerator)
+    val actualDataFrame = dataFrame.addRawTimestampColumnFromInputFilePath("CREATED_TS_raw")(cloudStorePathMetaGenerator)
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
 
-  test("appendRawTsToDataFrameTest(inputType = raw)") {
+  test("appendRawTsToDataFrameTest(operation = addColumn)") {
     val dataFrame = spark.read.format("avro").load(inputAvroPath1)
 
     val expectedSchema = List(
@@ -168,12 +168,12 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
 
     Mockito.when(cloudStorePathMetaGenerator.partFileRawTsMapGenerator(inputPathsArray)).thenReturn(pathTsMap)
     import com.zeotap.source.spark.constructs.DataFrameOps._
-    val actualDataFrame = dataFrame.appendRawTsToDataFrame("raw")(cloudStorePathMetaGenerator)
+    val actualDataFrame = dataFrame.appendRawTsToDataFrame("addColumn", None, "CREATED_TS_raw")(cloudStorePathMetaGenerator)
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
 
-  test("appendRawTsToDataFrameTest(inputType = raw) when dataFrame already has CREATED_TS_raw column") {
+  test("appendRawTsToDataFrameTest(operation = addColumn) when dataFrame already has outputColumn") {
     val schema = List(
       StructField("Common_DataPartnerID", IntegerType, true),
       StructField("DeviceId", StringType, true),
@@ -193,57 +193,10 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
     )
 
     import com.zeotap.source.spark.constructs.DataFrameOps._
-    assertThrows[IllegalStateException](dataFrame.appendRawTsToDataFrame("raw"))
+    assertThrows[IllegalStateException](dataFrame.appendRawTsToDataFrame("addColumn", None, "CREATED_TS_raw"))
   }
 
-  test("vanilla appendRawTsToDataFrameTest(inputType = preprocess)") {
-    val schema = List(
-      StructField("Common_DataPartnerID", IntegerType, true),
-      StructField("DeviceId", StringType, true),
-      StructField("Demographic_Country", StringType, true),
-      StructField("Common_TS", StringType, true),
-      StructField("CREATED_TS_raw", StringType, true)
-    )
-
-    val dataFrame = spark.createDataFrame(
-      spark.sparkContext.parallelize(Seq(
-        Row(1,"1","India","1504679559","1627929000"),
-        Row(1,"2","India","1504679359","1627929000"),
-        Row(1,"3","Spain","1504679459","1627929000"),
-        Row(1,"4","India","1504679659","1627929000")
-      )),
-      StructType(schema)
-    )
-
-    import com.zeotap.source.spark.constructs.DataFrameOps._
-    val actualDataFrame = dataFrame.appendRawTsToDataFrame("preprocess")
-
-    assertDataFrameEquality(dataFrame, actualDataFrame, "DeviceId")
-  }
-
-  test("appendRawTsToDataFrameTest(inputType = preprocess) when dataFrame does not have CREATED_TS_raw column") {
-    val schema = List(
-      StructField("Common_DataPartnerID", IntegerType, true),
-      StructField("DeviceId", StringType, true),
-      StructField("Demographic_Country", StringType, true),
-      StructField("Common_TS", StringType, true)
-    )
-
-    val dataFrame = spark.createDataFrame(
-      spark.sparkContext.parallelize(Seq(
-        Row(1,"1","India","1504679559"),
-        Row(1,"2","India","1504679359"),
-        Row(1,"3","Spain","1504679459"),
-        Row(1,"4","India","1504679659")
-      )),
-      StructType(schema)
-    )
-
-    import com.zeotap.source.spark.constructs.DataFrameOps._
-    assertThrows[NoSuchElementException](dataFrame.appendRawTsToDataFrame("preprocess"))
-  }
-
-  test("vanilla appendRawTsToDataFrameTest(inputType = tube)") {
+  test("vanilla appendRawTsToDataFrameTest(operation = renameColumn)") {
     val schema = List(
       StructField("Common_DataPartnerID", IntegerType, true),
       StructField("DeviceId", StringType, true),
@@ -265,12 +218,12 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
     val expectedDataFrame = dataFrame.withColumn("CREATED_TS_raw", col("timestamp"))
 
     import com.zeotap.source.spark.constructs.DataFrameOps._
-    val actualDataFrame = dataFrame.appendRawTsToDataFrame("tube")
+    val actualDataFrame = dataFrame.appendRawTsToDataFrame("renameColumn", Option("timestamp"), "CREATED_TS_raw")
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
 
-  test("appendRawTsToDataFrameTest(inputType = tube) when dataFrame does not have timestamp column") {
+  test("appendRawTsToDataFrameTest(operation = renameColumn) when dataFrame does not have inputColumn") {
     val schema = List(
       StructField("Common_DataPartnerID", IntegerType, true),
       StructField("DeviceId", StringType, true),
@@ -289,14 +242,14 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
     )
 
     import com.zeotap.source.spark.constructs.DataFrameOps._
-    assertThrows[NoSuchElementException](dataFrame.appendRawTsToDataFrame("tube"))
+    assertThrows[NoSuchElementException](dataFrame.appendRawTsToDataFrame("renameColumn", Option("timestamp"), "CREATED_TS_raw"))
   }
 
-  test("appendRawTsToDataFrameTest wrong inputType") {
+  test("appendRawTsToDataFrameTest wrong operation") {
     val dataFrame = spark.emptyDataFrame
 
     import com.zeotap.source.spark.constructs.DataFrameOps._
-    assertThrows[IllegalArgumentException](dataFrame.appendRawTsToDataFrame("wrongInputType"))
+    assertThrows[IllegalArgumentException](dataFrame.appendRawTsToDataFrame("wrongOperation", None, "random"))
   }
 
 }

@@ -29,7 +29,11 @@ object SupportedFeatures {
   final case class MergeSchema[A]() extends SupportedFeatures[A]
 
   // JDBC Reader-specific features
-  final case class ConnectionProperties[A](url: String, user: String, password: String, tableName: String) extends SupportedFeatures[A]
+  final case class ConnectionProperties[A](url: String, user: String, password: String) extends SupportedFeatures[A]
+
+  final case class TableName[A](tableName: String) extends SupportedFeatures[A]
+
+  final case class Query[A](query: String) extends SupportedFeatures[A]
 
   final case class CustomSchema[A](schema: String) extends SupportedFeatures[A]
 
@@ -48,6 +52,6 @@ object SupportedFeatures {
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]
 
   // FS DataFrame-specific features
-  final case class AddCreationTimestamp[A](inputType: String) extends SupportedFeatures[A]
+  final case class AddCreationTimestamp[A](operation: String, inputColumn: Option[String], outputColumn: String) extends SupportedFeatures[A]
 
 }

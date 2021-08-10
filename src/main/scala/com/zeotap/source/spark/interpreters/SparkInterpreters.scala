@@ -27,7 +27,9 @@ object SparkInterpreters {
         case MultiLine() => dataFrameReader.option("multiLine", "true")
         case AvroSchema(jsonSchema) => dataFrameReader.option("avroSchema", jsonSchema)
         case MergeSchema() => dataFrameReader.option("mergeSchema", "true")
-        case ConnectionProperties(url, user, password, tableName) => dataFrameReader.option("url", url).option("user", user).option("password", password).option("dbtable", tableName)
+        case ConnectionProperties(url, user, password) => dataFrameReader.option("url", url).option("user", user).option("password", password)
+        case TableName(tableName) => dataFrameReader.option("dbtable", tableName)
+        case Query(query) => dataFrameReader.option("query", query)
         case CustomSchema(schema) => dataFrameReader.option("customSchema", schema)
         case _ => dataFrameReader
       }
@@ -53,7 +55,7 @@ object SparkInterpreters {
     override def apply[A](feature: SupportedFeatures[A]): SparkDataFrame[A] = State { sparkDataFrame =>
       val dataFrame: DataFrame = feature match {
         case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
-        case AddCreationTimestamp(inputType) => sparkDataFrame.appendRawTsToDataFrame(inputType)
+        case AddCreationTimestamp(operation, inputColumn, outputColumn) => sparkDataFrame.appendRawTsToDataFrame(operation, inputColumn, outputColumn)
         case _ => sparkDataFrame
       }
       (dataFrame, sparkDataFrame.asInstanceOf[A])
