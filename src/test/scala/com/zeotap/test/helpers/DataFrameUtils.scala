@@ -1,4 +1,4 @@
-package com.zeotap.source.spark.test.helpers
+package com.zeotap.test.helpers
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import org.apache.spark.sql.DataFrame
@@ -13,6 +13,13 @@ object DataFrameUtils extends FunSuite with DataFrameSuiteBase {
 
     assertDataFrameEquals(expectedDf.select(expectedColumns : _*).distinct.orderBy(sortColumn),
       actualDf.select(actualColumns : _*).distinct.orderBy(sortColumn))
+  }
+
+  def safeColumnUnion(df1: DataFrame, df2: DataFrame): DataFrame = {
+    val df1Columns = df1.columns.sorted.map(col)
+    val df2Columns = df2.columns.sorted.map(col)
+
+    df1.select(df1Columns : _*).union(df2.select(df2Columns : _*))
   }
 
 }

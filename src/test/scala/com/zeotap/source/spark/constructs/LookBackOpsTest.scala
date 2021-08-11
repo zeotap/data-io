@@ -2,7 +2,7 @@ package com.zeotap.source.spark.constructs
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.source.spark.constructs.LookBackOps.getAllPossiblePaths
-import com.zeotap.source.spark.test.helpers.DataFrameUtils.assertDataFrameEquality
+import com.zeotap.test.helpers.DataFrameUtils.assertDataFrameEquality
 import com.zeotap.source.utils.DataPickupUtils
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
