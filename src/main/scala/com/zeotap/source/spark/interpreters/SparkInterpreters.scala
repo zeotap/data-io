@@ -44,7 +44,7 @@ object SparkInterpreters {
         case LoadPath(path) => dataFrameReader.load(path)
         case LoadPaths(paths) => dataFrameReader.load(paths : _*)
         case LookBack(pathTemplate, parameters, lookBackWindow) => dataFrameReader.lookBack(pathTemplate, parameters, lookBackWindow)
-        case LatestPath(pathTemplate, parameters, relativeToCurrentDate) => dataFrameReader.latestPath(pathTemplate, parameters, relativeToCurrentDate)
+        case LatestPaths(pathTemplate, parameters, relativeToCurrentDate) => dataFrameReader.latestPaths(pathTemplate, parameters, relativeToCurrentDate)
         case _ => dataFrameReader.load()
       }
       dataFrame.asInstanceOf[A]

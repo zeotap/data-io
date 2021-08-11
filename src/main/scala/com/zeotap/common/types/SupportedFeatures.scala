@@ -46,7 +46,7 @@ object SupportedFeatures {
 
   final case class LookBack[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer) extends SupportedFeatures[A]
 
-  final case class LatestPath[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
+  final case class LatestPaths[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
 
   // DataFrame-specific features
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]

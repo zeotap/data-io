@@ -63,14 +63,16 @@ class FSSparkLoader(
     new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.lookBack(pathTemplate, parameters, lookBackWindow), dataFrameProperties)
 
   /**
-   * The latest path with respect to the given date is obtained and loaded into a `DataFrame`.
-   * If relativeToCurrentDate is set to true, the obtained path will be of a date prior to the provided date and
-   * if it is set to false, the latest path available in the fileSystem will be returned.
+   * The latest paths (sub-folders for a given pathTemplate) with respect to the given date are obtained and loaded into a `DataFrame`.
+   * If relativeToCurrentDate is set to true, the obtained paths will be of a date prior to the provided date and
+   * if it is set to false, the latest paths available in the fileSystem will be returned.
    * @param parameters should contain values for YR, MON, DT. HR and MIN are optional.
    * @param pathTemplate Example: gs://bucket/path/yr=${YR}/mon=${MON}/dt=${DT}
    */
-  def latestPath(pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.latestPath(pathTemplate, parameters, relativeToCurrentDate), dataFrameProperties)
+  // Another example for pathTemplate: gs://bucket/*/yr=${YR}/mon=${MON}/dt=${DT}, this would return the latest paths for
+  // gs://bucket/path1/yr=${YR}/mon=${MON}/dt=${DT}, gs://bucket/path2/yr=${YR}/mon=${MON}/dt=${DT}, etc.
+  def latestPaths(pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): FSSparkLoader =
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.latestPaths(pathTemplate, parameters, relativeToCurrentDate), dataFrameProperties)
 
   /**
    * Only if a provided column does not exist in the DataFrame, it will be added with the provided defaultValue.

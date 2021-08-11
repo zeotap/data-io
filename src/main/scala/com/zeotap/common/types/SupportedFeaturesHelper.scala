@@ -42,7 +42,7 @@ object SupportedFeaturesHelper {
 
   def lookBack[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer): SupportedFeaturesF[A] = liftF(LookBack[A](pathTemplate, parameters, lookBackWindow))
 
-  def latestPath[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): SupportedFeaturesF[A] = liftF(LatestPath[A](pathTemplate, parameters, relativeToCurrentDate))
+  def latestPaths[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean): SupportedFeaturesF[A] = liftF(LatestPaths[A](pathTemplate, parameters, relativeToCurrentDate))
 
   def addOptionalColumns[A](columns: List[OptionalColumn]): SupportedFeaturesF[A] = liftF(AddOptionalColumns[A](columns))
 

@@ -26,7 +26,7 @@ object LatestPathOps {
       sparkPaths
   }
 
-  def getLatestPath(pathTemplate: Path, fs: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): String = {
+  def getAllLatestPaths(pathTemplate: Path, fs: FileSystem, parameters: Map[String, String], relativeToCurrentDate: Boolean): List[String] = {
     val wildCardedPathTemplate = DataPickupUtils.populatePathTemplateWithParameters(pathTemplate.toString,
       List("DT", "MON", "YR", "MIN", "HR").map((_, WILDCARD_CHARACTER)).toMap
     )
@@ -43,7 +43,7 @@ object LatestPathOps {
           matchingPathList.map(_.toString).max
         else EMPTY_STRING
       }
-    }).values.filter(StringUtils.isNotEmpty).head
+    }).values.filter(StringUtils.isNotEmpty).toList
   }
 
   def getDateFields(path: Path, pathTemplate: Path): String = {

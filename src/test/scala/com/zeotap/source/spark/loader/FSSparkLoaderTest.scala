@@ -169,7 +169,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val df = new FSSparkLoader()
       .addFormat(AVRO)
-      .latestPath("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "17"), false)
+      .latestPaths("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "17"), false)
       .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")

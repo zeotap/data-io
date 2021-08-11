@@ -6,6 +6,7 @@ import com.zeotap.source.utils.DataPickupUtils
 import org.apache.commons.io.FileUtils
 import org.apache.hadoop.fs.Path
 import org.apache.spark.sql.Row
+import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
@@ -16,6 +17,7 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
   val inputAvroPath1 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=19"
   val inputAvroPath2 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=18"
   val inputAvroPath3 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=17"
+  val inputAvroPath4 : String = "src/test/resources/custom-input-format2/yr=2021/mon=07/dt=17"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -77,6 +79,7 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     )
 
     sampleDf3.write.format("avro").save(inputAvroPath3)
+    sampleDf3.withColumn("dummy", lit("random")).write.format("avro").save(inputAvroPath4)
   }
 
   override def afterAll(): Unit = {
@@ -84,6 +87,7 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     FileUtils.forceDelete(new File(inputAvroPath1))
     FileUtils.forceDelete(new File(inputAvroPath2))
     FileUtils.forceDelete(new File(inputAvroPath3))
+    FileUtils.forceDelete(new File(inputAvroPath4))
   }
 
   test("getDateFieldsTest") {
@@ -106,10 +110,22 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
     val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
 
-    val expectedLatestPath = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=17"
-    val actualLatestPath = "src" + LatestPathOps.getLatestPath(new Path(fullPathTemplate), fileSystem, parameters, true).split("src")(1)
+    val expectedLatestPaths = List("src/test/resources/custom-input-format/yr=2021/mon=07/dt=17")
+    val actualLatestPaths = LatestPathOps.getAllLatestPaths(new Path(fullPathTemplate), fileSystem, parameters, true).map(x=> "src" + x.split("src")(1))
 
-    assert(expectedLatestPath == actualLatestPath)
+    assert(expectedLatestPaths == actualLatestPaths)
+  }
+
+  test("getLatestPaths relativeToCurrentDate = true (including sub-folders)") {
+    val pathTemplate = "src/test/resources/*/yr=${YR}/mon=${MON}/dt=${DT}"
+    val fullPathTemplate = "file:" + new File(pathTemplate).getAbsolutePath
+    val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
+    val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
+
+    val expectedLatestPaths = List("src/test/resources/custom-input-format/yr=2021/mon=07/dt=17","src/test/resources/custom-input-format2/yr=2021/mon=07/dt=17")
+    val actualLatestPaths = LatestPathOps.getAllLatestPaths(new Path(fullPathTemplate), fileSystem, parameters, true).map(x=> "src" + x.split("src")(1))
+
+    assert(expectedLatestPaths.sorted == actualLatestPaths.sorted)
   }
 
   test("getAllLatestPaths relativeToCurrentDate = false") {
@@ -118,10 +134,10 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
     val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
 
-    val expectedLatestPath = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=19"
-    val actualLatestPath = "src" + LatestPathOps.getLatestPath(new Path(fullPathTemplate), fileSystem, parameters, false).split("src")(1)
+    val expectedLatestPaths = List("src/test/resources/custom-input-format/yr=2021/mon=07/dt=19")
+    val actualLatestPaths = LatestPathOps.getAllLatestPaths(new Path(fullPathTemplate), fileSystem, parameters, false).map(x=> "src" + x.split("src")(1))
 
-    assert(expectedLatestPath == actualLatestPath)
+    assert(expectedLatestPaths == actualLatestPaths)
   }
 
   test("getPathsForPattern") {
@@ -147,24 +163,45 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
   test("latestPathReadTest") {
     val pathTemplate = "src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}"
     val fullPathTemplate = "file:" + new File(pathTemplate).getAbsolutePath
-    val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
+    val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "17")
 
     val expectedDataFrame = spark.read.format("avro").load(inputAvroPath1)
     import com.zeotap.source.spark.constructs.DataFrameReaderOps._
-    val actualDataFrame = spark.read.format("avro").latestPath(fullPathTemplate, parameters, false)
+    val actualDataFrame = spark.read.format("avro").latestPaths(fullPathTemplate, parameters, false)
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
 
   test("latestPathReadTest2") {
-    val pathTemplate = "src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}"
+    val pathTemplate = "src/test/resources/*/yr=${YR}/mon=${MON}/dt=${DT}"
     val fullPathTemplate = "file:" + new File(pathTemplate).getAbsolutePath
     val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "18")
 
-    val expectedDataFrame = spark.read.format("avro").load(inputAvroPath3)
+    val schema = List(
+      StructField("Common_DataPartnerID", IntegerType, true),
+      StructField("Demographic_Country", StringType, true),
+      StructField("Common_TS", StringType, true),
+      StructField("DeviceId", StringType, true),
+      StructField("Demographic_Gender", StringType, true),
+      StructField("dummy", StringType, true)
+    )
+
+    val expectedDataFrame = spark.createDataFrame(
+      spark.sparkContext.parallelize(Seq(
+        Row(1,"France","1504679559","5","Male",null),
+        Row(1,"Germany","1504679359","6","Female",null),
+        Row(1,"Italy","1504679459","7","Female",null),
+        Row(1,"Belgium","1504679659","8","Male",null),
+        Row(1,"France","1504679559","5","Male","random"),
+        Row(1,"Germany","1504679359","6","Female","random"),
+        Row(1,"Italy","1504679459","7","Female","random"),
+        Row(1,"Belgium","1504679659","8","Male","random")
+      )),
+      StructType(schema)
+    )
+
     import com.zeotap.source.spark.constructs.DataFrameReaderOps._
-    val actualDataFrame = spark.read.format("avro").latestPath(fullPathTemplate, parameters, true)
-    spark.read.format("avro")
+    val actualDataFrame = spark.read.format("avro").latestPaths(fullPathTemplate, parameters, true)
 
     assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
   }
