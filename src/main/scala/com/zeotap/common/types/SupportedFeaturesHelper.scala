@@ -8,9 +8,9 @@ object SupportedFeaturesHelper {
 
   type SupportedFeaturesF[A] = Free[SupportedFeatures, A]
 
-  def schema[A](schema: String): SupportedFeaturesF[A] = liftF(Schema[A](schema))
-
   def addFormat[A](datatype: DataFormatType): SupportedFeaturesF[A] = liftF(FormatType[A](datatype))
+
+  def schema[A](schema: String): SupportedFeaturesF[A] = liftF(Schema[A](schema))
 
   def basePath[A](path: String): SupportedFeaturesF[A] = liftF(BasePath[A](path))
 
@@ -47,5 +47,13 @@ object SupportedFeaturesHelper {
   def addOptionalColumns[A](columns: List[OptionalColumn]): SupportedFeaturesF[A] = liftF(AddOptionalColumns[A](columns))
 
   def addCreationTimestamp[A](operation: String, inputColumn: Option[String], outputColumn: String): SupportedFeaturesF[A] = liftF(AddCreationTimestamp[A](operation, inputColumn, outputColumn))
+
+  def addSaveMode[A](saveMode: SaveMode): SupportedFeaturesF[A] = liftF(AddSaveMode[A](saveMode))
+
+  def partitionBy[A](columnNames: List[String]): SupportedFeaturesF[A] = liftF(PartitionBy[A](columnNames))
+
+  def saveToPath[A](path: String): SupportedFeaturesF[A] = liftF(SaveToPath[A](path))
+
+  def save[A](): SupportedFeaturesF[A] = liftF(Save[A]())
 
 }
