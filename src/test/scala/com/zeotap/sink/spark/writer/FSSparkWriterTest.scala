@@ -2,17 +2,17 @@ package com.zeotap.sink.spark.writer
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.common.types._
-import com.zeotap.test.helpers.DataFrameUtils.{assertDataFrameEquality, safeColumnUnion}
+import com.zeotap.test.helpers.DataFrameUtils.{assertDataFrameEquality, unionByName}
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
 
 import java.io.File
 
-class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
+class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameSuiteBase {
 
-  val avroPath : String = "src/test/resources/custom-input-format/yr=2021/mon=08/dt=05"
+  val avroPath : String = "src/test/resources/custom-output-format/yr=2021/mon=08/dt=05"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -20,6 +20,11 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
 
   override def afterAll(): Unit = {
     super.afterAll()
+  }
+
+  override def afterEach(): Unit = {
+    super.afterEach()
+    FileUtils.deleteQuietly(new File(avroPath))
   }
 
   test("basicWriteTest") {
@@ -48,7 +53,6 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
 
     val savedDf = spark.read.format("avro").load(avroPath)
     assertDataFrameEquality(df, savedDf, "DeviceId")
-    FileUtils.forceDelete(new File(avroPath))
   }
 
   test("errorIfExistsTest") {
@@ -80,7 +84,6 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
     assert(eitherExceptionOrSave.isLeft)
     assert(!eitherExceptionOrSave.isRight)
     assert(eitherExceptionOrSave.left.get.contains("already exists"))
-    FileUtils.forceDelete(new File(avroPath))
   }
 
   test("overwriteTest") {
@@ -132,7 +135,6 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
     val actualDf = spark.read.format("avro").load(avroPath)
 
     assertDataFrameEquality(df2, actualDf, "DeviceId")
-    FileUtils.forceDelete(new File(avroPath))
   }
 
   test("ignoreTest") {
@@ -184,7 +186,6 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
     val actualDf = spark.read.format("avro").load(avroPath)
 
     assertDataFrameEquality(df1, actualDf, "DeviceId")
-    FileUtils.forceDelete(new File(avroPath))
   }
 
   test("appendTest") {
@@ -234,8 +235,7 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
     assert(eitherExceptionOrSave.isRight)
 
     val actualDf = spark.read.format("avro").load(avroPath)
-    assertDataFrameEquality(safeColumnUnion(df1, df2), actualDf, "DeviceId")
-    FileUtils.forceDelete(new File(avroPath))
+    assertDataFrameEquality(unionByName(df1, df2), actualDf, "DeviceId")
   }
 
   test("partitionByTest") {
@@ -270,8 +270,7 @@ class FSSparkWriterTest extends FunSuite with DataFrameSuiteBase {
 
     assert(partitionedDf1.count() == 3)
     assert(partitionedDf2.count() == 1)
-    assertDataFrameEquality(df.drop("Demographic_Country"), safeColumnUnion(partitionedDf1, partitionedDf2), "DeviceId")
-    FileUtils.forceDelete(new File(avroPath))
+    assertDataFrameEquality(df.drop("Demographic_Country"), unionByName(partitionedDf1, partitionedDf2), "DeviceId")
   }
 
 }

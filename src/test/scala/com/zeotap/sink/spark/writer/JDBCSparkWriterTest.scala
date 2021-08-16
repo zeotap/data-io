@@ -2,15 +2,15 @@ package com.zeotap.sink.spark.writer
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.common.types.{APPEND, ERROR_IF_EXISTS, IGNORE, OVERWRITE}
-import com.zeotap.test.helpers.DataFrameUtils.{assertDataFrameEquality, safeColumnUnion}
+import com.zeotap.test.helpers.DataFrameUtils.{assertDataFrameEquality, unionByName}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
-import org.scalatest.FunSuite
+import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import org.testcontainers.containers.PostgreSQLContainer
 
 import java.sql.DriverManager
 
-class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
+class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameSuiteBase {
 
   val container = new PostgreSQLContainer("postgres:9.6.12")
 
@@ -22,6 +22,11 @@ class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
   override def afterAll(): Unit = {
     super.afterAll()
     container.stop()
+  }
+
+  override def afterEach(): Unit = {
+    super.afterEach()
+    dropTable(container.getJdbcUrl, container.getUsername, container.getPassword, "org.postgresql.Driver")
   }
 
   def dropTable(dbUrl: String, dbUserName: String, dbPassword: String, driverName: String): Unit = {
@@ -65,7 +70,6 @@ class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
       .load()
 
     assertDataFrameEquality(df, actualDf, "id")
-    dropTable(container.getJdbcUrl, container.getUsername, container.getPassword, "org.postgresql.Driver")
   }
 
   test("errorIfExistsTest") {
@@ -110,7 +114,6 @@ class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
     assert(eitherExceptionOrSave.isLeft)
     assert(!eitherExceptionOrSave.isRight)
     assert(eitherExceptionOrSave.left.get.contains("already exists"))
-    dropTable(container.getJdbcUrl, container.getUsername, container.getPassword, "org.postgresql.Driver")
   }
 
   test("ignoreTest") {
@@ -163,7 +166,6 @@ class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
       .load()
 
     assertDataFrameEquality(df1, actualDf, "id")
-    dropTable(container.getJdbcUrl, container.getUsername, container.getPassword, "org.postgresql.Driver")
   }
 
   test("appendTest") {
@@ -215,8 +217,7 @@ class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(safeColumnUnion(df1, df2), actualDf, "id")
-    dropTable(container.getJdbcUrl, container.getUsername, container.getPassword, "org.postgresql.Driver")
+    assertDataFrameEquality(unionByName(df1, df2), actualDf, "id")
   }
 
   test("overwriteTest") {
@@ -269,7 +270,6 @@ class JDBCSparkWriterTest extends FunSuite with DataFrameSuiteBase {
       .load()
 
     assertDataFrameEquality(df2, actualDf, "id")
-    dropTable(container.getJdbcUrl, container.getUsername, container.getPassword, "org.postgresql.Driver")
   }
 
 }

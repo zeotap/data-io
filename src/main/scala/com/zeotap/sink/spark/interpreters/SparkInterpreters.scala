@@ -4,7 +4,6 @@ import cats.arrow.FunctionK
 import cats.data.Reader
 import com.zeotap.common.types.{DataFormatType, SaveMode, SupportedFeatures}
 import com.zeotap.common.types.SupportedFeatures._
-import com.zeotap.sink.spark.constructs.DataFrameWriterOps._
 import org.apache.spark.sql.DataFrameWriter
 
 object SparkInterpreters {
@@ -16,7 +15,7 @@ object SparkInterpreters {
       val writer: DataFrameWriter[_] = feature match {
         case FormatType(format) => dataFrameWriter.format(DataFormatType.value(format))
         case AddSaveMode(saveMode) => dataFrameWriter.mode(SaveMode.value(saveMode))
-        case PartitionBy(columnNames) => dataFrameWriter.partitionBy(columnNames)
+        case PartitionBy(columnNames) => dataFrameWriter.partitionBy(columnNames : _*)
         case ConnectionProperties(url, user, password) => dataFrameWriter.option("url", url).option("user", user).option("password", password)
         case TableName(tableName) => dataFrameWriter.option("dbtable", tableName)
         case _ => dataFrameWriter

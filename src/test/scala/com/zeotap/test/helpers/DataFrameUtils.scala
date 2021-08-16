@@ -15,7 +15,7 @@ object DataFrameUtils extends FunSuite with DataFrameSuiteBase {
       actualDf.select(actualColumns : _*).distinct.orderBy(sortColumn))
   }
 
-  def safeColumnUnion(df1: DataFrame, df2: DataFrame): DataFrame = {
+  def unionByName(df1: DataFrame, df2: DataFrame): DataFrame = {
     val df1Columns = df1.columns.sorted.map(col)
     val df2Columns = df2.columns.sorted.map(col)
 
