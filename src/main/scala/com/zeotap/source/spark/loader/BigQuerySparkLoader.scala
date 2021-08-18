@@ -1,13 +1,13 @@
 package com.zeotap.source.spark.loader
 
 import com.zeotap.common.types.SupportedFeaturesHelper.SupportedFeaturesF
-import com.zeotap.common.types.{BIGQUERY, OptionalColumn, SupportedFeaturesHelper}
+import com.zeotap.common.types.{BigQuery, OptionalColumn, SupportedFeaturesHelper}
 import com.zeotap.common.utils.CommonUtils.handleException
 import com.zeotap.source.utils.SparkLoaderUtils
 import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
 
 case class BigQuerySparkLoader(
-  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(BIGQUERY)),
+  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(BigQuery)),
   readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq(),
   dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
 ) {

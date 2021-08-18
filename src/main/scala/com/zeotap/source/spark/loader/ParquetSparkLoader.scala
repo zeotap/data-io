@@ -1,11 +1,11 @@
 package com.zeotap.source.spark.loader
 
 import com.zeotap.common.types.SupportedFeaturesHelper.SupportedFeaturesF
-import com.zeotap.common.types.{PARQUET, SupportedFeaturesHelper}
+import com.zeotap.common.types.{Parquet, SupportedFeaturesHelper}
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 case class ParquetSparkLoader(
-  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(PARQUET)),
+  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(Parquet)),
   readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq(),
   dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
 ) extends FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {

@@ -1,7 +1,7 @@
 package com.zeotap.source.spark.loader
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import com.zeotap.source.spark.test.helpers.DataFrameUtils.assertDataFrameEquality
+import com.zeotap.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types._

@@ -2,7 +2,7 @@ package com.zeotap.source.spark.loader
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.common.types._
-import com.zeotap.source.spark.test.helpers.DataFrameUtils.assertDataFrameEquality
+import com.zeotap.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
@@ -142,7 +142,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     )
 
     val df = new FSSparkLoader()
-      .addFormat(AVRO)
+      .addFormat(Avro)
       .lookBack("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "19"), 3)
       .buildUnsafe(spark)
 
@@ -168,7 +168,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     )
 
     val df = new FSSparkLoader()
-      .addFormat(AVRO)
+      .addFormat(Avro)
       .latestPaths("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "17"), false)
       .buildUnsafe(spark)
 
@@ -195,9 +195,9 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     )
 
     val df = new FSSparkLoader()
-      .addFormat(AVRO)
+      .addFormat(Avro)
       .load(inputAvroPath1)
-      .addOptionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
+      .addOptionalColumns(List(OptionalColumn("New_Column", "1234", String)))
       .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
@@ -224,10 +224,10 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     )
 
     val df = new FSSparkLoader()
-      .addFormat(AVRO)
+      .addFormat(Avro)
       .load(inputAvroPath1)
-      .addOptionalColumns(List(OptionalColumn("New_Column", "1234", STRING)))
-      .addOptionalColumns(List(OptionalColumn("New_Column2", "5678", INT)))
+      .addOptionalColumns(List(OptionalColumn("New_Column", "1234", String)))
+      .addOptionalColumns(List(OptionalColumn("New_Column2", "5678", Int)))
       .buildUnsafe(spark)
 
     assertDataFrameEquality(expectedDf, df, "DeviceId")
@@ -260,7 +260,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     )
 
     val df = new FSSparkLoader()
-      .addFormat(AVRO)
+      .addFormat(Avro)
       .schema(schemaJson)
       .load(List(inputAvroPath1, inputAvroPath2, inputAvroPath3))
       .buildUnsafe(spark)
