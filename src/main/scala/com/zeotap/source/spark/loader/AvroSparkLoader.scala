@@ -2,11 +2,11 @@ package com.zeotap.source.spark.loader
 
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.zeotap.common.types.SupportedFeaturesHelper.SupportedFeaturesF
-import com.zeotap.common.types.{AVRO, SupportedFeaturesHelper}
+import com.zeotap.common.types.{Avro, SupportedFeaturesHelper}
 import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 case class AvroSparkLoader(
-  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(AVRO)),
+  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(Avro)),
   readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq(),
   dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
 ) extends FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {

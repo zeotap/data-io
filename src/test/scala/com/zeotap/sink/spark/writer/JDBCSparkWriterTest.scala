@@ -1,7 +1,7 @@
 package com.zeotap.sink.spark.writer
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import com.zeotap.common.types.{APPEND, ERROR_IF_EXISTS, IGNORE, OVERWRITE}
+import com.zeotap.common.types.{Append, ErrorIfExists, Ignore, Overwrite}
 import com.zeotap.test.helpers.DataFrameUtils.{assertDataFrameEquality, unionByName}
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
@@ -107,7 +107,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
     val eitherExceptionOrSave = JDBCSparkWriter()
       .connectionProperties(container.getJdbcUrl, container.getUsername, container.getPassword)
       .tableName("test_table")
-      .addSaveMode(ERROR_IF_EXISTS)
+      .addSaveMode(ErrorIfExists)
       .save()
       .buildSafe(df2)
 
@@ -151,7 +151,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
     val eitherExceptionOrSave = JDBCSparkWriter()
       .connectionProperties(container.getJdbcUrl, container.getUsername, container.getPassword)
       .tableName("test_table")
-      .addSaveMode(IGNORE)
+      .addSaveMode(Ignore)
       .save()
       .buildSafe(df2)
 
@@ -203,7 +203,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
     val eitherExceptionOrSave = JDBCSparkWriter()
       .connectionProperties(container.getJdbcUrl, container.getUsername, container.getPassword)
       .tableName("test_table")
-      .addSaveMode(APPEND)
+      .addSaveMode(Append)
       .save()
       .buildSafe(df2)
 
@@ -255,7 +255,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
     val eitherExceptionOrSave = JDBCSparkWriter()
       .connectionProperties(container.getJdbcUrl, container.getUsername, container.getPassword)
       .tableName("test_table")
-      .addSaveMode(OVERWRITE)
+      .addSaveMode(Overwrite)
       .save()
       .buildSafe(df2)
 

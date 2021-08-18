@@ -25,7 +25,7 @@ case class JDBCSparkWriter(
 
   /**
    * Adds the saveMode to the Spark DataFrameWriter
-   * @param saveMode Supported formats = {APPEND, ERROR_IF_EXISTS, IGNORE, OVERWRITE}
+   * @param saveMode Supported formats = {Append, ErrorIfExists, Ignore, Overwrite}
    */
   def addSaveMode(saveMode: SaveMode): JDBCSparkWriter =
     JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.addSaveMode(saveMode), writerToSinkProperties)

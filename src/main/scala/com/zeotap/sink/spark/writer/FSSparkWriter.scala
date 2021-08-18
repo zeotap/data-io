@@ -13,14 +13,14 @@ class FSSparkWriter(
 
   /**
    * Adds the output format to the Spark DataFrameWriter
-   * @param format Supported formats = {TEXT, CSV, JSON, AVRO, PARQUET, ORC}
+   * @param format Supported formats = {Text, CSV, JSON, Avro, Parquet, ORC}
    */
   def addFormat(format: DataFormatType): FSSparkWriter =
     new FSSparkWriter(writerProperties :+ SupportedFeaturesHelper.addFormat(format), writerToSinkProperties)
 
   /**
    * Adds the saveMode to the Spark DataFrameWriter
-   * @param saveMode Supported formats = {APPEND, ERROR_IF_EXISTS, IGNORE, OVERWRITE}
+   * @param saveMode Supported formats = {Append, ErrorIfExists, Ignore, Overwrite}
    */
   def addSaveMode(saveMode: SaveMode): FSSparkWriter =
     new FSSparkWriter(writerProperties :+ SupportedFeaturesHelper.addSaveMode(saveMode), writerToSinkProperties)

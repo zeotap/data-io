@@ -1,7 +1,7 @@
 package com.zeotap.source.spark.constructs
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import com.zeotap.common.types.{INT, OptionalColumn, STRING}
+import com.zeotap.common.types.{Int, OptionalColumn, String}
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
@@ -52,8 +52,8 @@ class OptionalColumnOpsTest extends FunSuite with DataFrameSuiteBase {
   test("optional columns provided but already exist in df") {
     val dataFrame = spark.read.format("avro").load(inputAvroPath)
     val optionalColumns = List(
-      OptionalColumn("Common_TS", null, STRING),
-      OptionalColumn("DeviceId", null, STRING)
+      OptionalColumn("Common_TS", null, String),
+      OptionalColumn("DeviceId", null, String)
     )
     import com.zeotap.source.spark.constructs.DataFrameOps._
     val actualDataFrame = dataFrame.addOptionalColumns(optionalColumns)
@@ -64,9 +64,9 @@ class OptionalColumnOpsTest extends FunSuite with DataFrameSuiteBase {
   test("optional columns provided that are not present in df") {
     val dataFrame = spark.read.format("avro").load(inputAvroPath)
     val optionalColumns = List(
-      OptionalColumn("New_Column", "defaultValue", STRING),
-      OptionalColumn("New_Column2", null, STRING),
-      OptionalColumn("New_Column3", "10", INT)
+      OptionalColumn("New_Column", "defaultValue", String),
+      OptionalColumn("New_Column2", null, String),
+      OptionalColumn("New_Column3", "10", Int)
     )
     import com.zeotap.source.spark.constructs.DataFrameOps._
     val actualDataFrame = dataFrame.addOptionalColumns(optionalColumns)

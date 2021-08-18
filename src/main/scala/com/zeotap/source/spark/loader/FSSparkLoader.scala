@@ -21,7 +21,7 @@ class FSSparkLoader(
 
   /**
    * Adds the input format to the Spark DataFrameReader
-   * @param format Supported formats = {TEXT, CSV, JSON, AVRO, PARQUET, ORC}
+   * @param format Supported formats = {Text, CSV, JSON, Avro, Parquet, ORC}
    */
   def addFormat(format: DataFormatType): FSSparkLoader =
     new FSSparkLoader(readerProperties :+ SupportedFeaturesHelper.addFormat(format), readerToDataFrameProperties, dataFrameProperties)
@@ -78,7 +78,7 @@ class FSSparkLoader(
    * Only if a provided column does not exist in the DataFrame, it will be added with the provided defaultValue.
    * This option can be used when a certain column is not provided by a DP everyday but is required in the further operations
    * @param columns is a list of OptionalColumn(columnName: String, defaultValue: String, dataType: DataType)
-   * Supported dataTypes = {STRING, BOOLEAN, BYTE, SHORT, INT, LONG, FLOAT, DOUBLE, DECIMAL, DATE, TIMESTAMP}
+   * Supported DataTypes = {String, Boolean, Byte, Short, Int, Long, Float, Double, Decimal, Date, Timestamp}
    */
   def addOptionalColumns(columns: List[OptionalColumn]): FSSparkLoader =
     new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addOptionalColumns(columns))

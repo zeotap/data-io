@@ -46,8 +46,8 @@ class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameS
     )
 
     new FSSparkWriter()
-      .addFormat(AVRO)
-      .addSaveMode(OVERWRITE)
+      .addFormat(Avro)
+      .addSaveMode(Overwrite)
       .save(avroPath)
       .buildUnsafe(df)
 
@@ -76,8 +76,8 @@ class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameS
     df.write.format("avro").save(avroPath)
 
     val eitherExceptionOrSave = new FSSparkWriter()
-      .addFormat(AVRO)
-      .addSaveMode(ERROR_IF_EXISTS)
+      .addFormat(Avro)
+      .addSaveMode(ErrorIfExists)
       .save(avroPath)
       .buildSafe(df)
 
@@ -124,8 +124,8 @@ class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameS
     )
 
     val eitherExceptionOrSave = new FSSparkWriter()
-      .addFormat(AVRO)
-      .addSaveMode(OVERWRITE)
+      .addFormat(Avro)
+      .addSaveMode(Overwrite)
       .save(avroPath)
       .buildSafe(df2)
 
@@ -175,8 +175,8 @@ class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameS
     )
 
     val eitherExceptionOrSave = new FSSparkWriter()
-      .addFormat(AVRO)
-      .addSaveMode(IGNORE)
+      .addFormat(Avro)
+      .addSaveMode(Ignore)
       .save(avroPath)
       .buildSafe(df2)
 
@@ -226,8 +226,8 @@ class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameS
     )
 
     val eitherExceptionOrSave = new FSSparkWriter()
-      .addFormat(AVRO)
-      .addSaveMode(APPEND)
+      .addFormat(Avro)
+      .addSaveMode(Append)
       .save(avroPath)
       .buildSafe(df2)
 
@@ -257,7 +257,7 @@ class FSSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFrameS
     )
 
     val eitherExceptionOrSave = new FSSparkWriter()
-      .addFormat(AVRO)
+      .addFormat(Avro)
       .partitionBy(List("Demographic_Country"))
       .save(avroPath)
       .buildSafe(df)
