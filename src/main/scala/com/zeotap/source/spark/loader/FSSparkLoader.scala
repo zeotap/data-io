@@ -1,16 +1,14 @@
 package com.zeotap.source.spark.loader
 
 import com.zeotap.common.types.SupportedFeaturesHelper.SupportedFeaturesF
-import com.zeotap.common.types.{DataFormatType, OptionalColumn, SupportedFeaturesHelper}
-import com.zeotap.common.utils.CommonUtils.handleException
-import com.zeotap.source.utils.SparkLoaderUtils
-import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
+import com.zeotap.common.types.{DataFormatType, SupportedFeaturesHelper}
+import org.apache.spark.sql.{DataFrame, DataFrameReader}
 
 class FSSparkLoader(
   readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(),
   readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq(),
   dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
-) {
+) extends SparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {
 
   /**
    * Provides custom schema to the Spark DataFrameReader
@@ -75,15 +73,6 @@ class FSSparkLoader(
     new FSSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.latestPaths(pathTemplate, parameters, relativeToCurrentDate), dataFrameProperties)
 
   /**
-   * Only if a provided column does not exist in the DataFrame, it will be added with the provided defaultValue.
-   * This option can be used when a certain column is not provided by a DP everyday but is required in the further operations
-   * @param columns is a list of OptionalColumn(columnName: String, defaultValue: String, dataType: DataType)
-   * Supported DataTypes = {String, Boolean, Byte, Short, Int, Long, Float, Double, Decimal, Date, Timestamp}
-   */
-  def addOptionalColumns(columns: List[OptionalColumn]): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addOptionalColumns(columns))
-
-  /**
    * Adds a column based on the provided operation
    * @param operation needs to be one of `addColumn`, `renameColumn`
    * case `addColumn` => outputTsColumn calculated from the flat files' create TS
@@ -91,17 +80,6 @@ class FSSparkLoader(
    */
   def addCreationTimestamp(operation: String, inputColumn: Option[String], outputColumn: String): FSSparkLoader =
     new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addCreationTimestamp(operation, inputColumn, outputColumn))
-
-  /**
-   * Returns a `DataFrame` based on all the provided reader and dataFrame properties
-   */
-  def buildUnsafe(implicit spark: SparkSession): DataFrame =
-    SparkLoaderUtils.buildLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties)
-
-  /**
-   * Exception-safe build function to return either exception message or `DataFrame`
-   */
-  def buildSafe(implicit spark: SparkSession): Either[String, DataFrame] = handleException(buildUnsafe)
 
 }
 
