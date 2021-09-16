@@ -22,6 +22,7 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    spark.conf.set("spark.sql.session.timeZone", "IST")
 
     val testSchema = List(
       StructField("Common_DataPartnerID", IntegerType, true),

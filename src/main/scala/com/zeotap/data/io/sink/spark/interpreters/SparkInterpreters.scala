@@ -14,6 +14,10 @@ object SparkInterpreters {
     override def apply[A](feature: SupportedFeatures[A]): SparkSinkWriter[A] = Reader { dataFrameWriter =>
       val writer: DataFrameWriter[_] = feature match {
         case FormatType(format) => dataFrameWriter.format(DataFormatType.value(format))
+        case Separator(separator) => dataFrameWriter.option("sep", separator)
+        case InferSchema() => dataFrameWriter.option("inferSchema", "true")
+        case Header() => dataFrameWriter.option("header", "true")
+        case Compression(compression) => dataFrameWriter.option("compression", compression)
         case AddSaveMode(saveMode) => dataFrameWriter.mode(SaveMode.value(saveMode))
         case PartitionBy(columnNames) => dataFrameWriter.partitionBy(columnNames : _*)
         case ConnectionProperties(url, user, password) => dataFrameWriter.option("url", url).option("user", user).option("password", password)

@@ -42,4 +42,20 @@ object DataType {
     }
   }
 
+  def valueOf(dataType: String): DataType = {
+    dataType match {
+      case "string" => String
+      case "boolean" => Boolean
+      case "byte" => Byte
+      case "short" => Short
+      case "int" => Int
+      case "long" => Long
+      case "float" => Float
+      case "double" => Double
+      case "decimal" => Decimal
+      case "date" => Date
+      case "timestamp" => Timestamp
+    }
+  }
+
 }

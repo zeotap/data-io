@@ -13,7 +13,7 @@ object SupportedFeatures {
   // FS Reader-specific features
   final case class BasePath[A](path: String) extends SupportedFeatures[A]
 
-  // CSV Reader-specific features
+  // CSV and Text Reader and Writer-specific features
   final case class InferSchema[A]() extends SupportedFeatures[A]
 
   final case class Header[A]() extends SupportedFeatures[A]
@@ -64,5 +64,8 @@ object SupportedFeatures {
   final case class SaveToPath[A](path: String) extends SupportedFeatures[A]
 
   final case class Save[A]() extends SupportedFeatures[A]
+
+  // JSON Writer-specific features
+  final case class Compression[A](compression: String) extends SupportedFeatures[A]
 
 }

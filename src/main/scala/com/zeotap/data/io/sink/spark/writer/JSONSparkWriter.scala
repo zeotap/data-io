@@ -9,4 +9,10 @@ case class JSONSparkWriter(
   writerToSinkProperties: Seq[SupportedFeaturesF[Unit]] = Seq()
 ) extends FSSparkWriter(writerProperties, writerToSinkProperties) {
 
+  /**
+   * This option can be provided if compression is required
+   */
+  def compression(compression: String): JSONSparkWriter =
+    JSONSparkWriter(writerProperties :+ SupportedFeaturesHelper.compression(compression), writerToSinkProperties)
+
 }
