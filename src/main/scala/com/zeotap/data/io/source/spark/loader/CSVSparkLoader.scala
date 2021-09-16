@@ -28,4 +28,5 @@ case class CSVSparkLoader(
    */
   def header: CSVSparkLoader =
     CSVSparkLoader(readerProperties :+ SupportedFeaturesHelper.header, readerToDataFrameProperties, dataFrameProperties)
+
 }
