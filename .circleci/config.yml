@@ -137,14 +137,14 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              only: /^(development|ci-setup)$/
+              only: /^development$/
       - release:
           context: Q3-2020
           filters:
             branches:
-              only: /^(master)$/
+              only: /^master$/
       - buildonly:
           context: Q3-2020
           filters:
             branches:
-              ignore: /^(development|master|ci-setup)$/
+              ignore: /^(development|master)$/
