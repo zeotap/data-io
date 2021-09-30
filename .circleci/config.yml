@@ -4,13 +4,9 @@ jobs:
 
     working_directory: ~/project
 
-    docker:
-      - image: zeotap-docker.jfrog.io/zeotap-maven:sbt
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASSWORD
-
-    resource_class: large
+    machine:
+      image: ubuntu-1604:201903-01
+      resource_class: large
 
     steps:
 
@@ -43,13 +39,10 @@ jobs:
 
     working_directory: ~/project
 
-    docker:
-      - image: zeotap-docker.jfrog.io/zeotap-maven:sbt
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASSWORD
+    machine:
+      image: ubuntu-1604:201903-01
+      resource_class: large
 
-    resource_class: large
     steps:
 
       - checkout
@@ -105,13 +98,10 @@ jobs:
 
     working_directory: ~/project
 
-    docker:
-      - image: zeotap-docker.jfrog.io/zeotap-maven:sbt
-        auth:
-          username: $DOCKER_USER
-          password: $DOCKER_PASSWORD
+    machine:
+      image: ubuntu-1604:201903-01
+      resource_class: large
 
-    resource_class: large
     steps:
 
       - checkout
