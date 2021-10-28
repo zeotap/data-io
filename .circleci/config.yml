@@ -13,7 +13,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: source-{{ checksum "build.sbt" }}
+          key: source-{{ .Environment.CACHE_VERSION }}-{{ checksum "build.sbt" }}
 
       - run:
           name: Setup SBT
@@ -33,7 +33,7 @@ jobs:
             - ~/.sbt
             - ~/.m2/repository
             - ~/.ivy2
-          key: source-{{ checksum "build.sbt" }}
+          key: source-{{ .Environment.CACHE_VERSION }}-{{ checksum "build.sbt" }}
 
   release:
 
@@ -58,7 +58,7 @@ jobs:
             git config user.email "builds@zeotap.com"
 
       - restore_cache:
-          key: source-{{ checksum "build.sbt" }}
+          key: source-{{ .Environment.CACHE_VERSION }}-{{ checksum "build.sbt" }}
 
       - run:
           name: Setup SBT
@@ -92,7 +92,7 @@ jobs:
             - ~/.sbt
             - ~/.m2/repository
             - ~/.ivy2
-          key: source-{{ checksum "build.sbt" }}
+          key: source-{{ .Environment.CACHE_VERSION }}-{{ checksum "build.sbt" }}
 
   buildonly:
 
@@ -107,7 +107,7 @@ jobs:
       - checkout
 
       - restore_cache:
-          key: source-{{ checksum "build.sbt" }}
+          key: source-{{ .Environment.CACHE_VERSION }}-{{ checksum "build.sbt" }}
 
       - run:
           name: Setup SBT
@@ -127,7 +127,7 @@ jobs:
             - ~/.sbt
             - ~/.m2/repository
             - ~/.ivy2
-          key: source-{{ checksum "build.sbt" }}
+          key: source-{{ .Environment.CACHE_VERSION }}-{{ checksum "build.sbt" }}
 
 workflows:
   version: 2
