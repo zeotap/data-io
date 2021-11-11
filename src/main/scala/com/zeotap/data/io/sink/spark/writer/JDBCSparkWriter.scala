@@ -16,6 +16,12 @@ case class JDBCSparkWriter(
     JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.connectionProperties(url, user, password), writerToSinkProperties)
 
   /**
+   * This function can be used to provide the JDBC driver class name required by Spark to write to JDBC
+   */
+  def driver(driver: String): JDBCSparkWriter =
+    JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.driver(driver), writerToSinkProperties)
+
+  /**
    * Provides the tableName required by Spark to write to JDBC
    */
   def tableName(tableName: String): JDBCSparkWriter =

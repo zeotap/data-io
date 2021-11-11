@@ -32,6 +32,8 @@ object SupportedFeatures {
   // JDBC Reader and writer-specific features
   final case class ConnectionProperties[A](url: String, user: String, password: String) extends SupportedFeatures[A]
 
+  final case class Driver[A](driver: String) extends SupportedFeatures[A]
+
   final case class TableName[A](tableName: String) extends SupportedFeatures[A]
 
   // JDBC Reader specific features
