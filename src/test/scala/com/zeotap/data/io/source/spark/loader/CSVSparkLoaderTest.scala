@@ -1,27 +1,20 @@
 package com.zeotap.data.io.source.spark.loader
 
+import java.io.File
+
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
+import com.zeotap.data.io.common.test.helpers.CommonUtils.writeToFile
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
-import java.io.{File, PrintWriter}
-
 class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
   val inputCSVPath1 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=19"
   val inputCSVPath2 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=18"
   val inputCSVPath3 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=17"
-
-  def writeToFile(path: String, data: String): Unit = {
-    val fileObject = new File(path)
-    val printWriter = new PrintWriter(fileObject)
-
-    printWriter.write(data)
-    printWriter.close()
-  }
 
   override def beforeAll(): Unit = {
     super.beforeAll()

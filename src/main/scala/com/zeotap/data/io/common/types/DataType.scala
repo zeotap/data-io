@@ -58,4 +58,20 @@ object DataType {
     }
   }
 
+  def convert(dataType: DataType, value: String): Any = {
+    dataType match {
+      case String => value
+      case Boolean => java.lang.Boolean.valueOf(value)
+      case Byte => java.lang.Byte.parseByte(value)
+      case Short => java.lang.Short.parseShort(value)
+      case Int => java.lang.Integer.parseInt(value)
+      case Long => java.lang.Long.parseLong(value)
+      case Float => java.lang.Float.parseFloat(value)
+      case Double => java.lang.Double.parseDouble(value)
+      case Timestamp => java.sql.Timestamp.valueOf(value)
+    }
+  }
+
+  def convert(dataType: String, value: String): Any = convert(valueOf(dataType), value)
+
 }
