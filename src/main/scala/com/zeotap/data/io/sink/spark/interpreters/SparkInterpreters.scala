@@ -23,6 +23,7 @@ object SparkInterpreters {
         case ConnectionProperties(url, user, password) => dataFrameWriter.option("url", url).option("user", user).option("password", password)
         case Driver(driver) => dataFrameWriter.option("driver", driver)
         case TableName(tableName) => dataFrameWriter.option("dbtable", tableName)
+        case StringType(stringType) => dataFrameWriter.option("stringtype", stringType)
         case _ => dataFrameWriter
       }
       writer.asInstanceOf[A]

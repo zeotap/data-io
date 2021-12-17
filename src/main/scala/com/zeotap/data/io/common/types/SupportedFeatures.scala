@@ -36,6 +36,8 @@ object SupportedFeatures {
 
   final case class TableName[A](tableName: String) extends SupportedFeatures[A]
 
+  final case class StringType[A](stringType: String) extends SupportedFeatures[A]
+
   // JDBC Reader specific features
   final case class Query[A](query: String) extends SupportedFeatures[A]
 

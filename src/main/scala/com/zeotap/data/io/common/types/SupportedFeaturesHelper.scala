@@ -32,6 +32,8 @@ object SupportedFeaturesHelper {
 
   def tableName[A](tableName: String): SupportedFeaturesF[A] = liftF(TableName[A](tableName))
 
+  def stringType[A](stringType: String): SupportedFeaturesF[A] = liftF(StringType[A](stringType))
+
   def query[A](query: String): SupportedFeaturesF[A] = liftF(Query[A](query))
 
   def customSchema[A](schema: String): SupportedFeaturesF[A] = liftF(CustomSchema[A](schema))

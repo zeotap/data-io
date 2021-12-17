@@ -29,6 +29,12 @@ case class JDBCSparkLoader(
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.tableName(tableName), readerToDataFrameProperties, dataFrameProperties)
 
   /**
+   * Provides the stringtype mapping required by Spark to read from JDBC
+   */
+  def stringType(stringType: String): JDBCSparkLoader =
+    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.stringType(stringType), readerToDataFrameProperties, dataFrameProperties)
+
+  /**
    * Provides a custom query to Spark for loading from JDBC. Example: "select c1, c2 from t1". Cannot be used along with tableName
    */
   def query(query: String): JDBCSparkLoader =

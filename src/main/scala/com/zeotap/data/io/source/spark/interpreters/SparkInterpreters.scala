@@ -30,6 +30,7 @@ object SparkInterpreters {
         case ConnectionProperties(url, user, password) => dataFrameReader.option("url", url).option("user", user).option("password", password)
         case Driver(driver) => dataFrameReader.option("driver", driver)
         case TableName(tableName) => dataFrameReader.option("dbtable", tableName)
+        case StringType(stringType) => dataFrameReader.option("stringtype", stringType)
         case Query(query) => dataFrameReader.option("query", query)
         case CustomSchema(schema) => dataFrameReader.option("customSchema", schema)
         case _ => dataFrameReader
