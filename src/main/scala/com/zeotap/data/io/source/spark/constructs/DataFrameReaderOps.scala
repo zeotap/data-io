@@ -38,7 +38,7 @@ object DataFrameReaderOps {
       safeReadMultiPath(paths)
     }
 
-    private def safeReadMultiPath(paths: List[String]): DataFrame = {
+    def safeReadMultiPath(paths: List[String]): DataFrame = {
       val initialDf = dataFrameReader.load(paths.head)
       paths.foldLeft(initialDf)((accDf, path) => {
         val currDf = dataFrameReader.load(path)
