@@ -2,6 +2,7 @@ package com.zeotap.data.io.sink.beam.constructs
 
 import com.zeotap.data.io.helpers.beam.BeamHelpers
 import org.apache.avro.generic.GenericRecord
+import org.apache.beam.sdk.coders.AvroCoder
 import org.apache.beam.sdk.io.{AvroIO, TextIO}
 import org.apache.beam.sdk.values.PCollection
 
@@ -16,8 +17,9 @@ object PCollectionWriterOps {
       PCollectionWriter(pCollectionWriter.pCollection, pCollectionWriter.options ++ options)
 
     def save(path: String): Unit = {
-      implicit val pCollection: PCollection[GenericRecord] = pCollectionWriter.pCollection
       val (options, schema) = getOptionsAndSchema
+      implicit val pCollection: PCollection[GenericRecord] = pCollectionWriter.pCollection
+        .apply(BeamHelpers.convertRowToGenericRecord()).setCoder(AvroCoder.of(BeamHelpers.parseAvroSchema(schema)))
       options("format") match {
         case "avro" => writeAvro(schema, path + "/part")
         case "parquet" => writeParquet(schema, path)
@@ -29,8 +31,9 @@ object PCollectionWriterOps {
     }
 
     def save(): Unit = {
-      implicit val pCollection: PCollection[GenericRecord] = pCollectionWriter.pCollection
       val (options, schema) = getOptionsAndSchema
+      implicit val pCollection: PCollection[GenericRecord] = pCollectionWriter.pCollection
+        .apply(BeamHelpers.convertRowToGenericRecord()).setCoder(AvroCoder.of(BeamHelpers.parseAvroSchema(schema)))
       options("format") match {
         case "jdbc" => writeJDBC(schema, options("driver").toString, options("url").toString, options("user").toString, options("password").toString, options("tableName").toString)
         case _ => throw new IllegalArgumentException("Format not supported!")

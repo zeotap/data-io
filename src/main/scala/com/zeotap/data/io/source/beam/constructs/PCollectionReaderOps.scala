@@ -9,7 +9,7 @@ import org.apache.beam.sdk.coders.AvroCoder
 import org.apache.beam.sdk.io.parquet.ParquetIO
 import org.apache.beam.sdk.io.{AvroIO, TextIO}
 import org.apache.beam.sdk.transforms.ParDo
-import org.apache.beam.sdk.values.PCollection
+import org.apache.beam.sdk.values.{PCollection, Row}
 
 import scala.collection.JavaConverters._
 
@@ -23,30 +23,33 @@ object PCollectionReaderOps {
     def options(options: Map[String, Any]): PCollectionReader =
       PCollectionReader(pCollectionReader.options ++ options)
 
-    def load(path: String)(implicit beam: Pipeline): PCollection[GenericRecord] = {
+    def load(path: String)(implicit beam: Pipeline): PCollection[Row] = {
       val (options, schema, schemaWithOptionalColumns) = getOptionsAndSchema
-      options("format") match {
+      val beamSchema = BeamHelpers.parseBeamSchema(schemaWithOptionalColumns)
+      (options("format") match {
         case "avro" => readAvro(schemaWithOptionalColumns, path + "/*.avro")
         case "parquet" => readParquet(schema, schemaWithOptionalColumns, path + "/*.parquet")
         case "text" => readTextOrCsv(schemaWithOptionalColumns, path + "/*.txt", options.getOrElse("delimiter", ",").toString)
         case "csv" => readTextOrCsv(schemaWithOptionalColumns, path + "/*.csv", options.getOrElse("delimiter", ",").toString)
         case "json" => readJSON(schemaWithOptionalColumns, path + "/*.json")
         case _ => throw new IllegalArgumentException("Format not supported!")
-      }
+      }).apply(BeamHelpers.convertGenericRecordToBeamRow()).setRowSchema(beamSchema)
     }
 
-    def load()(implicit beam: Pipeline): PCollection[GenericRecord] = {
+    def load()(implicit beam: Pipeline): PCollection[Row] = {
       val (options, schema, schemaWithOptionalColumns) = getOptionsAndSchema
-      options("format") match {
+      val beamSchema = BeamHelpers.parseBeamSchema(schemaWithOptionalColumns)
+      (options("format") match {
         case "jdbc" => readJDBC(schemaWithOptionalColumns, options("driver").toString, options("url").toString, options("user").toString, options("password").toString, options("query").toString)
         case _ => throw new IllegalArgumentException("Format not supported!")
-      }
+      }).apply(BeamHelpers.convertGenericRecordToBeamRow()).setRowSchema(beamSchema)
     }
 
     private def getOptionsAndSchema: (Map[String, Any], String, String) = {
       val options = pCollectionReader.options
       val schema = options("schema").toString
       val schemaWithOptionalColumns = BeamHelpers.addOptionalColumnsToSchema(schema, options.getOrElse("optionalColumns", List()).asInstanceOf[List[OptionalColumn]].asJava)
+      val beamSchema = BeamHelpers.parseBeamSchema(schemaWithOptionalColumns)
       (options, schema, schemaWithOptionalColumns)
     }
 

@@ -5,9 +5,8 @@ import com.zeotap.data.io.common.types.{OptionalColumn, SourceLoader, SupportedF
 import com.zeotap.data.io.common.utils.CommonUtils.handleException
 import com.zeotap.data.io.source.beam.constructs.PCollectionReader
 import com.zeotap.data.io.source.utils.BeamLoaderUtils
-import org.apache.avro.generic.GenericRecord
 import org.apache.beam.sdk.Pipeline
-import org.apache.beam.sdk.values.PCollection
+import org.apache.beam.sdk.values.{PCollection, Row}
 
 object BeamLoader {
 
@@ -27,7 +26,7 @@ object BeamLoader {
 
 class BeamLoader(
   readerProperties: Seq[SupportedFeaturesF[PCollectionReader]] = Seq(),
-  readerToPCollectionProperties: Seq[SupportedFeaturesF[PCollection[GenericRecord]]] = Seq()
+  readerToPCollectionProperties: Seq[SupportedFeaturesF[PCollection[Row]]] = Seq()
 ) extends SourceLoader {
 
   /**
@@ -42,12 +41,12 @@ class BeamLoader(
   /**
    * Returns a `PCollection[GenericRecord]` based on all the provided reader and pCollection properties
    */
-  def buildUnsafe(implicit beam: Pipeline): PCollection[GenericRecord] =
+  def buildUnsafe(implicit beam: Pipeline): PCollection[Row] =
     BeamLoaderUtils.buildLoader(readerProperties, readerToPCollectionProperties)
 
   /**
    * Exception-safe build function to return either exception message or `PCollection[GenericRecord]`
    */
-  def buildSafe(implicit beam: Pipeline): Either[String, PCollection[GenericRecord]] = handleException(buildUnsafe)
+  def buildSafe(implicit beam: Pipeline): Either[String, PCollection[Row]] = handleException(buildUnsafe)
 
 }

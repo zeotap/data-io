@@ -5,8 +5,7 @@ import com.zeotap.data.io.common.types.{SinkWriter, SupportedFeaturesHelper}
 import com.zeotap.data.io.common.utils.CommonUtils.handleException
 import com.zeotap.data.io.sink.beam.constructs.PCollectionWriter
 import com.zeotap.data.io.sink.utils.BeamWriterUtils
-import org.apache.avro.generic.GenericRecord
-import org.apache.beam.sdk.values.PCollection
+import org.apache.beam.sdk.values.{PCollection, Row}
 
 object BeamWriter {
 
@@ -36,9 +35,9 @@ class BeamWriter(
   def save(): BeamWriter =
   new BeamWriter(writerProperties, writerToSinkProperties :+ SupportedFeaturesHelper.save())
 
-  def buildUnsafe(implicit pCollection: PCollection[GenericRecord]): Unit =
+  def buildUnsafe(implicit pCollection: PCollection[Row]): Unit =
     BeamWriterUtils.buildWriter(writerProperties, writerToSinkProperties)
 
-  def buildSafe(implicit pCollection: PCollection[GenericRecord]): Either[String, Unit] = handleException(buildUnsafe)
+  def buildSafe(implicit pCollection: PCollection[Row]): Either[String, Unit] = handleException(buildUnsafe)
 
 }

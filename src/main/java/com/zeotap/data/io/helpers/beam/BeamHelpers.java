@@ -122,6 +122,16 @@ public class BeamHelpers {
     });
   }
 
+  public static ParDo.SingleOutput<Row, GenericRecord> convertRowToGenericRecord() {
+    return ParDo.of(new DoFn<Row, GenericRecord>() {
+      @ProcessElement
+      public void processElement(ProcessContext context) throws IllegalArgumentException {
+        Row row = context.element();
+        context.output(AvroUtils.toGenericRecord(row));
+      }
+    });
+  }
+
   public static JdbcIO.Read<GenericRecord> readRowAsGenericRecordFromJDBC(String schema, String driver, String url, String user, String password, String query) {
     return JdbcIO.<GenericRecord>read()
         .withDataSourceConfiguration(JdbcIO.DataSourceConfiguration.create(driver, url)
@@ -214,6 +224,10 @@ public class BeamHelpers {
 
   public static Schema parseAvroSchema(String schema) {
     return new Schema.Parser().parse(schema);
+  }
+
+  public static org.apache.beam.sdk.schemas.Schema parseBeamSchema(String schema) {
+    return AvroUtils.toBeamSchema(parseAvroSchema(schema));
   }
 
   private static Object getConvertedValue(Schema.Field field, String value) {
