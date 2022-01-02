@@ -6,9 +6,8 @@ import com.zeotap.data.io.common.types.SupportedFeatures._
 import com.zeotap.data.io.common.types.{DataFormatType, SupportedFeatures}
 import com.zeotap.data.io.source.beam.constructs.PCollectionReader
 import com.zeotap.data.io.source.beam.constructs.PCollectionReaderOps.PCollectionReaderExt
-import org.apache.avro.generic.GenericRecord
 import org.apache.beam.sdk.Pipeline
-import org.apache.beam.sdk.values.PCollection
+import org.apache.beam.sdk.values.{PCollection, Row}
 
 object BeamInterpreters {
 
@@ -35,7 +34,7 @@ object BeamInterpreters {
 
   def readerToPCollectionInterpreter(implicit beam: Pipeline): FunctionK[SupportedFeatures, BeamReader] = new FunctionK[SupportedFeatures, BeamReader] {
     override def apply[A](feature: SupportedFeatures[A]): BeamReader[A] = Reader { pCollectionReader =>
-      val pCollection: PCollection[GenericRecord] = feature match {
+      val pCollection: PCollection[Row] = feature match {
         case Load() => pCollectionReader.load()
         case LoadPath(path) => pCollectionReader.load(path)
       }

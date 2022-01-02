@@ -1,10 +1,8 @@
 package com.zeotap.data.io.sink.beam.writer
 
-import java.io.File
-
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
-import org.apache.avro.generic.GenericRecord
+import com.zeotap.data.io.helpers.beam.BeamHelpers
 import org.apache.beam.sdk.Pipeline
 import org.apache.beam.sdk.io.AvroIO
 import org.apache.beam.sdk.options.PipelineOptionsFactory
@@ -13,6 +11,8 @@ import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.apache.spark.sql.{DataFrame, Row}
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
+
+import java.io.File
 
 class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAfterEach {
 
@@ -65,7 +65,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
     FileUtils.forceDelete(new File(outputPath))
   }
 
-  def getGenericRecordPCollection()(implicit beam: Pipeline): PCollection[GenericRecord] = {
+  def getBeamRowPCollection()(implicit beam: Pipeline): PCollection[org.apache.beam.sdk.values.Row] = {
     val sampleDf = spark.createDataFrame(
       spark.sparkContext.parallelize(Seq(
         Row(1, "1", "India", "1504679559"),
@@ -77,7 +77,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
     )
 
     sampleDf.write.format("avro").save(tempInputPath)
-    beam.apply(AvroIO.readGenericRecords(schemaJson).from(tempInputPath + "/*.avro"))
+    beam.apply(AvroIO.readGenericRecords(schemaJson).from(tempInputPath + "/*.avro")).apply(BeamHelpers.convertGenericRecordToBeamRow()).setRowSchema(BeamHelpers.parseBeamSchema(schemaJson))
   }
 
   def assertExpectedDFEqualsSavedPCollection(actualDf: DataFrame): Unit = {
@@ -96,7 +96,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
 
   test("Avro write test") {
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     AvroBeamWriter().schema(schemaJson).save(outputPath).buildUnsafe(pCollection)
     beam.run()
@@ -106,7 +106,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
 
   test("Text write test") {
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     TextBeamWriter().schema(schemaJson).save(outputPath).buildUnsafe(pCollection)
     beam.run()
@@ -118,7 +118,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
 
   test("CSV write test") {
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     CSVBeamWriter().schema(schemaJson).save(outputPath).buildUnsafe(pCollection)
     beam.run()
@@ -130,7 +130,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
 
   test("JSON write test") {
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     JSONBeamWriter().schema(schemaJson).save(outputPath).buildUnsafe(pCollection)
     beam.run()
@@ -140,7 +140,7 @@ class FSBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAf
 
   test("Parquet write test") {
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     ParquetBeamWriter().schema(schemaJson).save(outputPath).buildUnsafe(pCollection)
     beam.run()

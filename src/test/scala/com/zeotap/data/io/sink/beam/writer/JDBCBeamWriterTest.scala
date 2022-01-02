@@ -1,11 +1,8 @@
 package com.zeotap.data.io.sink.beam.writer
 
-import java.io.File
-import java.sql.DriverManager
-
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
-import org.apache.avro.generic.GenericRecord
+import com.zeotap.data.io.helpers.beam.BeamHelpers
 import org.apache.beam.sdk.Pipeline
 import org.apache.beam.sdk.io.AvroIO
 import org.apache.beam.sdk.options.PipelineOptionsFactory
@@ -15,6 +12,9 @@ import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.{BeforeAndAfterEach, FunSuite}
 import org.testcontainers.containers.PostgreSQLContainer
+
+import java.io.File
+import java.sql.DriverManager
 
 class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAndAfterEach {
 
@@ -75,7 +75,7 @@ class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAnd
     dropTable("org.postgresql.Driver", container.getJdbcUrl, container.getUsername, container.getPassword)
   }
 
-  def getGenericRecordPCollection()(implicit beam: Pipeline): PCollection[GenericRecord] = {
+  def getBeamRowPCollection()(implicit beam: Pipeline): PCollection[org.apache.beam.sdk.values.Row] = {
     val sampleDf = spark.createDataFrame(
       spark.sparkContext.parallelize(Seq(
         Row(1, "1", "India", "1504679559"),
@@ -87,7 +87,7 @@ class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAnd
     )
 
     sampleDf.write.format("avro").save(tempInputPath)
-    beam.apply(AvroIO.readGenericRecords(schemaJson).from(tempInputPath + "/*.avro"))
+    beam.apply(AvroIO.readGenericRecords(schemaJson).from(tempInputPath + "/*.avro")).apply(BeamHelpers.convertGenericRecordToBeamRow()).setRowSchema(BeamHelpers.parseBeamSchema(schemaJson))
   }
 
   def createTable(driverName: String, dbUrl: String, dbUserName: String, dbPassword: String): Unit = {
@@ -124,7 +124,7 @@ class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAnd
   test("JDBC write test") {
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
 
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     JDBCBeamWriter()
       .schema(schemaJson)
@@ -160,7 +160,7 @@ class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAnd
     implicit val beam: Pipeline = Pipeline.create(PipelineOptionsFactory.create)
 
     insertRowsInTable("org.postgresql.Driver", container.getJdbcUrl, container.getUsername, container.getPassword)
-    val pCollection = getGenericRecordPCollection()
+    val pCollection = getBeamRowPCollection()
 
     JDBCBeamWriter()
       .schema(schemaJson)
