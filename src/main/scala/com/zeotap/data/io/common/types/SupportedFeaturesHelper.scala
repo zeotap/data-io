@@ -28,7 +28,11 @@ object SupportedFeaturesHelper {
 
   def connectionProperties[A](url: String, user: String, password: String): SupportedFeaturesF[A] = liftF(ConnectionProperties[A](url, user, password))
 
+  def driver[A](driver: String): SupportedFeaturesF[A] = liftF(Driver[A](driver))
+
   def tableName[A](tableName: String): SupportedFeaturesF[A] = liftF(TableName[A](tableName))
+
+  def stringType[A](stringType: String): SupportedFeaturesF[A] = liftF(StringType[A](stringType))
 
   def query[A](query: String): SupportedFeaturesF[A] = liftF(Query[A](query))
 

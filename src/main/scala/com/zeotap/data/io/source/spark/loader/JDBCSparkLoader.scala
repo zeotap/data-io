@@ -17,10 +17,22 @@ case class JDBCSparkLoader(
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.connectionProperties(url, user, password), readerToDataFrameProperties, dataFrameProperties)
 
   /**
+   * This function can be used to provide the JDBC driver class name required by Spark to read from JDBC
+   */
+  def driver(driver: String): JDBCSparkLoader =
+    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.driver(driver), readerToDataFrameProperties, dataFrameProperties)
+
+  /**
    * Provides the tableName required by Spark to read from JDBC. Cannot be used along with query
    */
   def tableName(tableName: String): JDBCSparkLoader =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.tableName(tableName), readerToDataFrameProperties, dataFrameProperties)
+
+  /**
+   * Provides the stringtype mapping required by Spark to read from JDBC
+   */
+  def stringType(stringType: String): JDBCSparkLoader =
+    JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.stringType(stringType), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Provides a custom query to Spark for loading from JDBC. Example: "select c1, c2 from t1". Cannot be used along with tableName

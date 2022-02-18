@@ -21,7 +21,9 @@ object SparkInterpreters {
         case AddSaveMode(saveMode) => dataFrameWriter.mode(SaveMode.value(saveMode))
         case PartitionBy(columnNames) => dataFrameWriter.partitionBy(columnNames : _*)
         case ConnectionProperties(url, user, password) => dataFrameWriter.option("url", url).option("user", user).option("password", password)
+        case Driver(driver) => dataFrameWriter.option("driver", driver)
         case TableName(tableName) => dataFrameWriter.option("dbtable", tableName)
+        case StringType(stringType) => dataFrameWriter.option("stringtype", stringType)
         case _ => dataFrameWriter
       }
       writer.asInstanceOf[A]
