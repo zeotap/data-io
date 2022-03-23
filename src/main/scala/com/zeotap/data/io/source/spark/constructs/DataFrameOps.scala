@@ -1,6 +1,6 @@
 package com.zeotap.data.io.source.spark.constructs
 
-import com.zeotap.cloudstorageutils.CloudStorePathMetaGenerator
+import com.zeotap.data.io.common.utils.CloudStorePathMetaGenerator
 import com.zeotap.data.io.common.types.{DataType, OptionalColumn}
 import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
