@@ -1,7 +1,7 @@
 package com.zeotap.data.io.source.spark.constructs
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import com.zeotap.cloudstorageutils.CloudStorePathMetaGenerator
+import com.zeotap.data.io.common.utils.CloudStorePathMetaGenerator
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
