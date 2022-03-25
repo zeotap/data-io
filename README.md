@@ -7,10 +7,15 @@
 [DSL Walkthrough](https://www.youtube.com/watch?v=W5GrOrVx5W4)
 
 ## Why
-We have observed, over a period of time in Data Engineering, a need for a robust API on top of the existing  Spark data source API so that we can declaratively provide (often used) parameters to load and write Data Sources with a standard set of features.
+We have observed, over a period of time in Data Engineering, a need for a robust API on top of the existing frameworks so that we can declaratively provide (often used) parameters to read and write Data Sources with standard set of features.
 
 We have built SourceLoader and SinkWriter APIs which can be imported and used everywhere whenever any project needs to load/save a Data Source.
 
+It is also very easy to add new feature to an existing framework
+|Supported Frameworks|
+|--------------------|
+|Apache Spark|
+|Apache Beam|
 ## Design
 
    1. Builder like pattern where it is easy to add or remove features related to reading/writing a data source. 
