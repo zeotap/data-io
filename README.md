@@ -1,5 +1,7 @@
 # Data IO
 
+[![Join the chat at https://gitter.im/zeotap/data-io](https://badges.gitter.im/zeotap/data-io.svg)](https://gitter.im/zeotap/data-io?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ### A Free based DSL for reading and writing data that supports highly used features out of the box
 
 [Slide Deck](https://docs.google.com/presentation/d/1QptgaD6BvEKZjDBRieA1B66XtnIn9JRm8B7_FHoDvYk)
