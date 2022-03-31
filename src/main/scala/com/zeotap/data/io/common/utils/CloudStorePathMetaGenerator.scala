@@ -18,7 +18,7 @@ class CloudStorePathMetaGenerator extends Serializable {
    * @return Map(PartFile -> Timestamp)
    */
   def partFileRawTsMapGenerator(inputPathList: Array[String]): Map[String, String] = {
-    inputPathList.map(new Path(_)).flatMap(path => {
+    inputPathList.map(path => if(path.endsWith("/*")) new Path(path.substring(0,path.indexOf("/*"))) else new Path(path)).flatMap(path => {
       val fileSystem = path.getFileSystem(new Configuration)
       val filesIterator = fileSystem.listFiles(path, true)
       val pathsMap = new mutable.HashMap[String, String]()
