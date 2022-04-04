@@ -54,6 +54,9 @@ object SupportedFeatures {
 
   final case class LatestPaths[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
 
+  //Dataframe-specific features
+  final case class Split[A](numberOfPartitions:Int,intermediatePath:String,prioritiseIntermediatePath:Boolean) extends SupportedFeatures[A]
+
   // DataFrame-specific features
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]
 

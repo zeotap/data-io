@@ -1,11 +1,13 @@
 package com.zeotap.data.io.source.spark.constructs
 
+import com.zeotap.data.io.common.types.{DataType, OptionalColumn, Overwrite}
 import com.zeotap.data.io.common.utils.CloudStorePathMetaGenerator
-import com.zeotap.data.io.common.types.{DataType, OptionalColumn}
-import org.apache.spark.sql.DataFrame
+import com.zeotap.data.io.sink.spark.writer.ParquetSparkWriter
+import com.zeotap.data.io.source.spark.loader.ParquetSparkLoader
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
+import org.apache.spark.sql.{DataFrame, SparkSession}
 
 object DataFrameOps {
 
@@ -70,6 +72,44 @@ object DataFrameOps {
       })
 
       dataFrame.withColumn("inputPathColumn", addInputPathColumn(input_file_name())).select("inputPathColumn").distinct().collect.map(row => row.getString(0))
+    }
+
+    /**
+     * Partitions given dataframe into number of partitions provided and writes the
+     * partitioned dataframe to the intermediate path provided, so that parallel processing can take place.
+     *
+     * @param numberOfPartitions         is number of partitions we want in the dataframe.
+     * @param intermediatePath           is the intermediate path in which the partitioned data frame is written.
+     * @param prioritiseIntermediatePath is boolean value which denotes whether the intermediate path (i.e already partitioned path)
+     *                                   needs to prioritised or should we force repartition.
+     * @return Returns Dataframe with specified number of partitions.
+     */
+
+    def split(numberOfPartitions: Int, intermediatePath: String, prioritiseIntermediatePath: Boolean)(spark: SparkSession): DataFrame = {
+      val rawInputDf = dataFrame
+      if (!prioritiseIntermediatePath) {
+        defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
+      }
+      else {
+        try {
+          val intermediateDf: DataFrame = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
+          if (intermediateDf.isEmpty) throw new IllegalArgumentException("Intermediate Data at " + intermediatePath + " is empty!")
+          else intermediateDf
+        }
+        catch {
+          case e:Exception => println("Warning : " + e.getMessage + "\ncontinuing with default splitting strategy!")
+            defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
+        }
+      }
+    }
+
+    /*
+    Default Splitting strategy, takes Raw Input Dataframe , re-partitions it and returns it for further processing.
+     */
+    def defaultSplit(rawInputDf: DataFrame, numberOfPartitions: Int, intermediatePath: String): DataFrame = {
+      val partitionedDf = rawInputDf.repartition(numberOfPartitions)
+      ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedDf)
+      partitionedDf
     }
   }
 

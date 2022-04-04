@@ -7,7 +7,7 @@ import com.zeotap.data.io.common.types.{DataFormatType, SupportedFeatures}
 import com.zeotap.data.io.source.spark.constructs.DataFrameOps._
 import com.zeotap.data.io.source.spark.constructs.DataFrameReaderOps._
 import org.apache.spark.sql.types.{DataType, StructType}
-import org.apache.spark.sql.{DataFrame, DataFrameReader}
+import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
 
 object SparkInterpreters {
 
@@ -53,11 +53,12 @@ object SparkInterpreters {
     }
   }
 
-  val dataFrameInterpreter: FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
+  def dataFrameInterpreter(implicit spark:SparkSession): FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
     override def apply[A](feature: SupportedFeatures[A]): SparkDataFrame[A] = State { sparkDataFrame =>
       val dataFrame: DataFrame = feature match {
         case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
         case AddCreationTimestamp(operation, inputColumn, outputColumn) => sparkDataFrame.appendRawTsToDataFrame(operation, inputColumn, outputColumn)
+        case Split(numberOfPartitions, intermediatePath, prioritiseIntermediatePath)  => sparkDataFrame.split(numberOfPartitions,intermediatePath,prioritiseIntermediatePath)(spark)
         case _ => sparkDataFrame
       }
       (dataFrame, sparkDataFrame.asInstanceOf[A])

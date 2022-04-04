@@ -42,6 +42,20 @@ class SparkLoader(
     new SparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addOptionalColumns(columns))
 
   /**
+   * Partitions given dataframe into number of partitions provided, so that parallel processing can take place.
+   *
+   * @param numberOfPartitions         is number of partitions we want in the dataframe.
+   * @param intermediatePath           is the intermediate path in which the partitioned data frame is written.
+   * @param prioritiseIntermediatePath is boolean value which denotes whether the intermediate path (i.e already partitioned path)
+   *                                   needs to prioritised or should we force repartition.
+   * @return Returns Dataframe with specified number of partitions.
+   */
+
+  def split(numberOfPartitions: Int, intermediatePath: String, prioritiseIntermediatePath: Boolean): FSSparkLoader =
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.split(numberOfPartitions, intermediatePath, prioritiseIntermediatePath))
+
+
+  /**
    * Returns a `DataFrame` based on all the provided reader and dataFrame properties
    */
   def buildUnsafe(implicit spark: SparkSession): DataFrame =
