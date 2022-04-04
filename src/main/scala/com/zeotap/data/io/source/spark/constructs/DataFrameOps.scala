@@ -4,10 +4,13 @@ import com.zeotap.data.io.common.types.{DataType, OptionalColumn, Overwrite}
 import com.zeotap.data.io.common.utils.CloudStorePathMetaGenerator
 import com.zeotap.data.io.sink.spark.writer.ParquetSparkWriter
 import com.zeotap.data.io.source.spark.loader.ParquetSparkLoader
+import org.apache.log4j.Logger
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
 import org.apache.spark.sql.{DataFrame, SparkSession}
+
+import scala.util.{Failure, Success}
 
 object DataFrameOps {
 
@@ -91,13 +94,16 @@ object DataFrameOps {
         defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
       }
       else {
-        try {
+        val intermediateDf = util.Try {
           val intermediateDf: DataFrame = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
           if (intermediateDf.isEmpty) throw new IllegalArgumentException("Intermediate Data at " + intermediatePath + " is empty!")
           else intermediateDf
         }
-        catch {
-          case e:Exception => println("Warning : " + e.getMessage + "\ncontinuing with default splitting strategy!")
+
+        intermediateDf match {
+          case Success(df) => df
+          case Failure(exception) =>
+            logger.log.info("Warning : " + exception.getMessage + "\ncontinuing with default splitting strategy!")
             defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
         }
       }
@@ -113,4 +119,8 @@ object DataFrameOps {
     }
   }
 
+}
+
+object logger extends Serializable {
+  @transient lazy val log: Logger = Logger.getLogger(this.getClass.getName)
 }
