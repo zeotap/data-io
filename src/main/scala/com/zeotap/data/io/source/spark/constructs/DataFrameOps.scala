@@ -95,9 +95,9 @@ object DataFrameOps {
       }
       else {
         val intermediateDf = util.Try {
-          val intermediateDf: DataFrame = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
-          if (intermediateDf.isEmpty) throw new IllegalArgumentException("Intermediate Data at " + intermediatePath + " is empty!")
-          else intermediateDf
+          val df: DataFrame = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
+          if (df.isEmpty) throw new IllegalArgumentException("Intermediate Data at " + intermediatePath + " is empty!")
+          else df
         }
 
         intermediateDf match {
