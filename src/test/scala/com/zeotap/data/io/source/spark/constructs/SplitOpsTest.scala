@@ -67,7 +67,7 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
       .buildUnsafe(spark)
 
     assertEquals(rawInputDf.rdd.getNumPartitions, 3)
-    assertDataFrameEquality(actualDf,rawInputDf,"DeviceId")
+    assertDataFrameEquality(actualDf, rawInputDf, "DeviceId")
   }
 
   test("Split when intermediate data is already available") {
@@ -87,14 +87,13 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
 
       if (priority) {
         assertEquals(rawInputDf.rdd.getNumPartitions, 3)
-        assertDataFrameEquality(actualDf,rawInputDf,"DeviceId")
+        assertDataFrameEquality(actualDf, rawInputDf, "DeviceId")
       } else {
         assertEquals(rawInputDf.rdd.getNumPartitions, 5)
-        assertDataFrameEquality(actualDf,rawInputDf,"DeviceId")
+        assertDataFrameEquality(actualDf, rawInputDf, "DeviceId")
       }
     })
   }
-
 
 
 }

@@ -81,14 +81,15 @@ object DataFrameOps {
      * Partitions given dataframe into number of partitions provided and writes the
      * partitioned dataframe to the intermediate path provided, so that parallel processing can take place.
      *
-     * @param numberOfPartitions         is number of partitions we want in the dataframe.
+     * @param numberOfPartitions         is the number of partitions we want in the dataframe.
      * @param intermediatePath           is the intermediate path in which the partitioned data frame is written.
      * @param prioritiseIntermediatePath is boolean value which denotes whether the intermediate path (i.e already partitioned path)
-     *                                   needs to prioritised or should we force repartition.
+     *                                   needs to prioritised or should we force repartition. If it is true then data at intermediate path
+     *                                   will be returned(if non empty).
      * @return Returns Dataframe with specified number of partitions.
      */
 
-    def split(numberOfPartitions: Int, intermediatePath: String, prioritiseIntermediatePath: Boolean)(spark: SparkSession): DataFrame = {
+    def split(numberOfPartitions: Int, intermediatePath: String, prioritiseIntermediatePath: Boolean)(implicit spark: SparkSession): DataFrame = {
       val rawInputDf = dataFrame
       if (!prioritiseIntermediatePath) {
         defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
@@ -112,10 +113,10 @@ object DataFrameOps {
     /*
     Default Splitting strategy, takes Raw Input Dataframe , re-partitions it and returns it for further processing.
      */
-    def defaultSplit(rawInputDf: DataFrame, numberOfPartitions: Int, intermediatePath: String): DataFrame = {
+    def defaultSplit(rawInputDf: DataFrame, numberOfPartitions: Int, intermediatePath: String)(implicit spark: SparkSession): DataFrame = {
       val partitionedDf = rawInputDf.repartition(numberOfPartitions)
       ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedDf)
-      partitionedDf
+      ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
     }
   }
 

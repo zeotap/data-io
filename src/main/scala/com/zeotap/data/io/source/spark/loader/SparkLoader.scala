@@ -1,7 +1,7 @@
 package com.zeotap.data.io.source.spark.loader
 
-import com.zeotap.data.io.common.types.{OptionalColumn, SourceLoader, SupportedFeaturesHelper}
 import com.zeotap.data.io.common.types.SupportedFeaturesHelper.SupportedFeaturesF
+import com.zeotap.data.io.common.types.{OptionalColumn, SourceLoader, SupportedFeaturesHelper}
 import com.zeotap.data.io.common.utils.CommonUtils.handleException
 import com.zeotap.data.io.source.utils.SparkLoaderUtils
 import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}

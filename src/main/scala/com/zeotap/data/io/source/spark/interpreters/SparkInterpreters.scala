@@ -53,12 +53,12 @@ object SparkInterpreters {
     }
   }
 
-  def dataFrameInterpreter(implicit spark:SparkSession): FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
+  def dataFrameInterpreter(implicit spark: SparkSession): FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
     override def apply[A](feature: SupportedFeatures[A]): SparkDataFrame[A] = State { sparkDataFrame =>
       val dataFrame: DataFrame = feature match {
         case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
         case AddCreationTimestamp(operation, inputColumn, outputColumn) => sparkDataFrame.appendRawTsToDataFrame(operation, inputColumn, outputColumn)
-        case Split(numberOfPartitions, intermediatePath, prioritiseIntermediatePath)  => sparkDataFrame.split(numberOfPartitions,intermediatePath,prioritiseIntermediatePath)(spark)
+        case Split(numberOfPartitions, intermediatePath, prioritiseIntermediatePath) => sparkDataFrame.split(numberOfPartitions, intermediatePath, prioritiseIntermediatePath)(spark)
         case _ => sparkDataFrame
       }
       (dataFrame, sparkDataFrame.asInstanceOf[A])

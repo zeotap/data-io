@@ -270,11 +270,11 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
   test("Test for multiple options with split") {
     val expectedSchema = List(
-      StructField("Common_DataPartnerID", IntegerType, true),
-      StructField("DeviceId", StringType, true),
-      StructField("Demographic_Country", StringType, true),
-      StructField("Common_TS", StringType, true),
-      StructField("Demographic_Gender", StringType, true)
+      StructField("Common_DataPartnerID", IntegerType, nullable = true),
+      StructField("DeviceId", StringType, nullable = true),
+      StructField("Demographic_Country", StringType, nullable = true),
+      StructField("Common_TS", StringType, nullable = true),
+      StructField("Demographic_Gender", StringType, nullable = true)
     )
 
     val expectedDf = spark.createDataFrame(
@@ -307,6 +307,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val intermediateDf = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
 
+    assert(3,intermediateDf.rdd.getNumPartitions)
     assert(3, df.rdd.getNumPartitions)
     assertDataFrameEquality(expectedDf, df, "DeviceId")
     assertDataFrameEquality(expectedDf, intermediateDf, "DeviceId")
