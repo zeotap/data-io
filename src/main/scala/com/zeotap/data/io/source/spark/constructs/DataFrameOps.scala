@@ -1,11 +1,13 @@
 package com.zeotap.data.io.source.spark.constructs
 
+import com.zeotap.data.io.common.constructs.BloomOps.reduceToSingleBloom
 import com.zeotap.data.io.common.utils.CloudStorePathMetaGenerator
 import com.zeotap.data.io.common.types.{DataType, OptionalColumn}
-import org.apache.spark.sql.DataFrame
+import org.apache.spark.sql.{DataFrame, Dataset, Encoder, Encoders, SparkSession}
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
+import org.apache.spark.util.sketch.BloomFilter
 
 object DataFrameOps {
 
@@ -71,6 +73,40 @@ object DataFrameOps {
 
       dataFrame.withColumn("inputPathColumn", addInputPathColumn(input_file_name())).select("inputPathColumn").distinct().collect.map(row => row.getString(0))
     }
+
+    /**
+     * Filters the input dataframe on given set of columns using the bloom filter
+     *
+     * @param columns Filter dataset for given set of columns
+     * @param bloomBasePath Bloom base path containing the column partitioned bloom filters
+     *
+     * @return Dataframe iteratively filtered for all columns
+     */
+    def filterByBloom(columns: Seq[String], bloomBasePath: String)(implicit spark: SparkSession): DataFrame = {
+      val sparkBloomEncoder: Encoder[BloomFilter] = Encoders.kryo(classOf[BloomFilter])
+
+      columns.foldLeft(dataFrame.limit(0))((df, colName) => {
+          val bloomDf = spark.read.parquet(s"$bloomBasePath/$colName")
+          val bloomDataset: Dataset[BloomFilter] = bloomDf.as[BloomFilter](sparkBloomEncoder)
+          val filteredDf = dataFrame.filterByBloom(colName, bloomDataset, reduceToSingleBloom)
+        df.union(filteredDf).dropDuplicates()
+      })
+    }
+
+    def filterByBloom(colName: String, bloomDataset: Dataset[BloomFilter], bloomAction: Dataset[BloomFilter] => BloomFilter)(implicit spark: SparkSession) : DataFrame ={
+      val bloomBroadcast = Some(spark.sparkContext.broadcast(bloomAction(bloomDataset)))
+      val filteredDf = dataFrame.filterByBloom(colName, bloomBroadcast.get.value)
+      bloomBroadcast.get.unpersist()
+      filteredDf
+    }
+
+    def filterByBloom(colName: String, bloom: BloomFilter) : DataFrame = {
+      def mightContainCheck(bloom: BloomFilter): UserDefinedFunction = udf((x: Any) =>
+        if(x != null) bloom.mightContain(x) else false)
+
+      dataFrame.filter(not(mightContainCheck(bloom)(col(colName)))).localCheckpoint()
+    }
+
   }
 
 }
