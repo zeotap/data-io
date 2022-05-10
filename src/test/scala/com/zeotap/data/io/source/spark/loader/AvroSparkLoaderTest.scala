@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
@@ -103,7 +103,7 @@ class AvroSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = AvroSparkLoader()
+    val df = AvroSparkLoader[DataFrame]()
       .load(inputAvroPath1)
       .buildUnsafe(spark)
 
@@ -163,7 +163,7 @@ class AvroSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
                    |}
                    |""".stripMargin
 
-    val df = AvroSparkLoader()
+    val df = AvroSparkLoader[DataFrame]()
       .avroSchema(schema)
       .load(inputAvroPath1)
       .buildUnsafe(spark)
@@ -216,7 +216,7 @@ class AvroSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
                    |}
                    |""".stripMargin
 
-    val df = AvroSparkLoader()
+    val df = AvroSparkLoader[DataFrame]()
       .avroSchema(new ObjectMapper().readTree(schema))
       .load(inputAvroPath1)
       .buildUnsafe(spark)

@@ -7,14 +7,14 @@ import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
 
 object SparkLoaderUtils {
 
-  def buildLoader(readerProperties: Seq[SupportedFeaturesF[DataFrameReader]],
-                  readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]],
-                  dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]])(implicit spark: SparkSession): DataFrame = {
+  def buildLoader[A](readerProperties: Seq[SupportedFeaturesF[DataFrameReader]],
+                  readerToDataFrameProperties: Seq[SupportedFeaturesF[A]],
+                  dataFrameProperties: Seq[SupportedFeaturesF[A]])(implicit spark: SparkSession): A = {
     val reader = featuresCompiler(readerProperties).foldMap[SparkReader](readerInterpreter).run(spark.read)
     val dataFrame = featuresCompiler(readerToDataFrameProperties).foldMap[SparkReader](readerToDataFrameInterpreter).run(reader)
 
     if (dataFrameProperties.nonEmpty) {
-      featuresCompiler(dataFrameProperties).foldMap[SparkDataFrame](dataFrameInterpreter).run(dataFrame).value._1
+      featuresCompiler(dataFrameProperties).foldMap[SparkDataFrame](dataFrameInterpreter).run(dataFrame.asInstanceOf[DataFrame]).value._1.asInstanceOf[A]
     } else dataFrame
   }
 

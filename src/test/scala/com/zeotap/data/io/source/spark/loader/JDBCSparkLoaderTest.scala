@@ -2,7 +2,7 @@ package com.zeotap.data.io.source.spark.loader
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.functions.col
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
@@ -59,7 +59,7 @@ class JDBCSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = JDBCSparkLoader()
+    val df = JDBCSparkLoader[DataFrame]()
       .connectionProperties(dbUrl, dbUserName, dbPassword)
       .tableName("test_table")
       .load()
@@ -104,7 +104,7 @@ class JDBCSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val expectedDf = insertedDf.withColumn("id", col("id").cast(StringType))
 
-    val df = JDBCSparkLoader()
+    val df = JDBCSparkLoader[DataFrame]()
       .customSchema("id string, name string")
       .connectionProperties(dbUrl, dbUserName, dbPassword)
       .query("select * from test_table")

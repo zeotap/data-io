@@ -2,42 +2,42 @@ package com.zeotap.data.io.source.spark.loader
 
 import com.zeotap.data.io.common.types.SupportedFeaturesHelper.SupportedFeaturesF
 import com.zeotap.data.io.common.types.{JDBC, SupportedFeaturesHelper}
-import org.apache.spark.sql.{DataFrame, DataFrameReader}
+import org.apache.spark.sql.DataFrameReader
 
-case class JDBCSparkLoader(
-  readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(JDBC)),
-  readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq(),
-  dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
-) extends SparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {
+case class JDBCSparkLoader[A](
+                               readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(JDBC)),
+                               readerToDataFrameProperties: Seq[SupportedFeaturesF[A]] = Seq(),
+                               dataFrameProperties: Seq[SupportedFeaturesF[A]] = Seq()
+                             ) extends SparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {
 
   /**
    * This function can be used to provide all the options required by Spark to read from JDBC
    */
-  def connectionProperties(url: String, user: String, password: String): JDBCSparkLoader =
+  def connectionProperties(url: String, user: String, password: String) =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.connectionProperties(url, user, password), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * This function can be used to provide the JDBC driver class name required by Spark to read from JDBC
    */
-  def driver(driver: String): JDBCSparkLoader =
+  def driver(driver: String) =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.driver(driver), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Provides the tableName required by Spark to read from JDBC. Cannot be used along with query
    */
-  def tableName(tableName: String): JDBCSparkLoader =
+  def tableName(tableName: String) =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.tableName(tableName), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Provides the stringtype mapping required by Spark to read from JDBC
    */
-  def stringType(stringType: String): JDBCSparkLoader =
+  def stringType(stringType: String) =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.stringType(stringType), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Provides a custom query to Spark for loading from JDBC. Example: "select c1, c2 from t1". Cannot be used along with tableName
    */
-  def query(query: String): JDBCSparkLoader =
+  def query(query: String) =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.query(query), readerToDataFrameProperties, dataFrameProperties)
 
   /**
@@ -47,14 +47,14 @@ case class JDBCSparkLoader(
    * For example, "id DECIMAL(38, 0)". The column names should be identical to the corresponding column names of JDBC table.
    * Users can specify the corresponding data types of Spark SQL instead of using the defaults.
    */
-  def customSchema(schema: String): JDBCSparkLoader =
+  def customSchema(schema: String) =
     JDBCSparkLoader(readerProperties :+ SupportedFeaturesHelper.customSchema(schema), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Loads input in as a `DataFrame`, for data sources that don't require a path (e.g. external
    * key-value stores).
    */
-  def load(): JDBCSparkLoader =
+  def load() =
     JDBCSparkLoader(readerProperties, readerToDataFrameProperties :+ SupportedFeaturesHelper.load(), dataFrameProperties)
 
 }

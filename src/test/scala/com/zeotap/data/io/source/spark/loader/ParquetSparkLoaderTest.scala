@@ -3,7 +3,7 @@ package com.zeotap.data.io.source.spark.loader
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
@@ -80,7 +80,7 @@ class ParquetSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = ParquetSparkLoader()
+    val df = ParquetSparkLoader[DataFrame]()
       .load(inputParquetPath1)
       .buildUnsafe(spark)
 
@@ -114,7 +114,7 @@ class ParquetSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = ParquetSparkLoader()
+    val df = ParquetSparkLoader[DataFrame]()
       .mergeSchema
       .load("src/test/resources/custom-input-format/yr=2021/mon=07")
       .buildUnsafe(spark)

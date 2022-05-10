@@ -4,7 +4,7 @@ import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.types._
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
@@ -106,7 +106,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = new FSSparkLoader()
+    val df = new FSSparkLoader[DataFrame]()
       .addFormat(ORC)
       .load(inputOrcPath)
       .buildUnsafe(spark)
@@ -141,7 +141,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = new FSSparkLoader()
+    val df = new FSSparkLoader[DataFrame]()
       .addFormat(Avro)
       .lookBack("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "19"), 3)
       .buildUnsafe(spark)
@@ -167,7 +167,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = new FSSparkLoader()
+    val df = new FSSparkLoader[DataFrame]()
       .addFormat(Avro)
       .latestPaths("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "17"), false)
       .buildUnsafe(spark)
@@ -194,7 +194,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = new FSSparkLoader()
+    val df = new FSSparkLoader[DataFrame]()
       .addFormat(Avro)
       .load(inputAvroPath1)
       .addOptionalColumns(List(OptionalColumn("New_Column", "1234", String)))
@@ -223,7 +223,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = new FSSparkLoader()
+    val df = new FSSparkLoader[DataFrame]()
       .addFormat(Avro)
       .load(inputAvroPath1)
       .addOptionalColumns(List(OptionalColumn("New_Column", "1234", String)))
@@ -259,7 +259,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       schema
     )
 
-    val df = new FSSparkLoader()
+    val df = new FSSparkLoader[DataFrame]()
       .addFormat(Avro)
       .schema(schemaJson)
       .load(List(inputAvroPath1, inputAvroPath2, inputAvroPath3))

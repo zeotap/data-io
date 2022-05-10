@@ -3,7 +3,7 @@ package com.zeotap.data.io.source.spark.loader
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types._
 import org.scalatest.FunSuite
 
@@ -80,7 +80,7 @@ class JSONSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = JSONSparkLoader()
+    val df = JSONSparkLoader[DataFrame]()
       .load(inputJsonPath1)
       .buildUnsafe(spark)
 
@@ -105,7 +105,7 @@ class JSONSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = JSONSparkLoader()
+    val df = JSONSparkLoader[DataFrame]()
       .multiLine
       .load(inputJsonPath2)
       .buildUnsafe(spark)

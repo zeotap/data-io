@@ -3,23 +3,23 @@ package com.zeotap.data.io.source.spark.loader
 import com.fasterxml.jackson.databind.{JsonNode, ObjectMapper}
 import com.zeotap.data.io.common.types.SupportedFeaturesHelper.SupportedFeaturesF
 import com.zeotap.data.io.common.types.{Avro, SupportedFeaturesHelper}
-import org.apache.spark.sql.{DataFrame, DataFrameReader}
+import org.apache.spark.sql.DataFrameReader
 
-case class AvroSparkLoader(
+case class AvroSparkLoader[A](
   readerProperties: Seq[SupportedFeaturesF[DataFrameReader]] = Seq(SupportedFeaturesHelper.addFormat(Avro)),
-  readerToDataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq(),
-  dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
-) extends FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {
+  readerToDataFrameProperties: Seq[SupportedFeaturesF[A]] = Seq(),
+  dataFrameProperties: Seq[SupportedFeaturesF[A]] = Seq()
+) extends FSSparkLoader[A](readerProperties, readerToDataFrameProperties, dataFrameProperties) {
 
   /**
    * Optional schema can be provided in a JSON string format
    */
-  def avroSchema(schema: String): AvroSparkLoader =
+  def avroSchema(schema: String) =
     AvroSparkLoader(readerProperties :+ SupportedFeaturesHelper.avroSchema(schema), readerToDataFrameProperties, dataFrameProperties)
 
   /**
    * Optional schema can be provided in a JSON format
    */
-  def avroSchema(jsonSchema: JsonNode): AvroSparkLoader =
+  def avroSchema(jsonSchema: JsonNode) =
     AvroSparkLoader(readerProperties :+ SupportedFeaturesHelper.avroSchema(new ObjectMapper().writeValueAsString(jsonSchema)), readerToDataFrameProperties, dataFrameProperties)
 }

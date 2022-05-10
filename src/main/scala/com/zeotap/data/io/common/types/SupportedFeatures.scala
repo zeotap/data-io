@@ -72,4 +72,5 @@ object SupportedFeatures {
   // JSON Writer-specific features
   final case class Compression[A](compression: String) extends SupportedFeatures[A]
 
+
 }

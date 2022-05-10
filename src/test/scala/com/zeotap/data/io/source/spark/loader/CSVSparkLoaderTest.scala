@@ -1,12 +1,11 @@
 package com.zeotap.data.io.source.spark.loader
 
 import java.io.File
-
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.CommonUtils.writeToFile
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
 import org.apache.commons.io.FileUtils
-import org.apache.spark.sql.Row
+import org.apache.spark.sql.{DataFrame, Row}
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
@@ -68,7 +67,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = CSVSparkLoader()
+    val df = CSVSparkLoader[DataFrame]()
       .load(inputCSVPath1)
       .buildUnsafe(spark)
 
@@ -92,7 +91,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = CSVSparkLoader()
+    val df = CSVSparkLoader[DataFrame]()
       .inferSchema
       .load(inputCSVPath1)
       .buildUnsafe(spark)
@@ -117,7 +116,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = CSVSparkLoader()
+    val df = CSVSparkLoader[DataFrame]()
       .separator(".")
       .load(inputCSVPath2)
       .buildUnsafe(spark)
@@ -142,7 +141,7 @@ class CSVSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       StructType(expectedSchema)
     )
 
-    val df = CSVSparkLoader()
+    val df = CSVSparkLoader[DataFrame]()
       .header
       .load(inputCSVPath3)
       .buildUnsafe(spark)
