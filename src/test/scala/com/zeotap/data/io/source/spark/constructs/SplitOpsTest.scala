@@ -56,14 +56,13 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
   test("default split test") {
 
     val numberOfPartitions = 3
-    val intermediatePath: String = "src/test/resources/custom-input-format/yr=2022/mon=03/dt=26_intermediate"
     val prioritiseIntermediatePath = false
 
     val actualDf = AvroSparkLoader().load(rawInputPath).buildUnsafe(spark)
 
     val rawInputDf = AvroSparkLoader()
       .load(rawInputPath)
-      .split(numberOfPartitions, intermediatePath, prioritiseIntermediatePath)
+      .distributedLoad(Option(numberOfPartitions), intermediatePath, Option(prioritiseIntermediatePath))
       .buildUnsafe(spark)
 
     assertEquals(rawInputDf.rdd.getNumPartitions, 3)
@@ -82,7 +81,7 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
 
     prioritiseIntermediatePathList.foreach(priority => {
       val rawInputDf = AvroSparkLoader().load(rawInputPath)
-        .split(numberOfPartitions, intermediatePath, priority)
+        .distributedLoad(Option(numberOfPartitions), intermediatePath, Option(priority))
         .buildUnsafe(spark)
 
       if (priority) {

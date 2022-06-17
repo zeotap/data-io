@@ -8,7 +8,7 @@ import org.apache.log4j.Logger
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
-import org.apache.spark.sql.{DataFrame, SparkSession}
+import org.apache.spark.sql.{DataFrame}
 
 import scala.util.{Failure, Success}
 
@@ -89,10 +89,21 @@ object DataFrameOps {
      * @return Returns Dataframe with specified number of partitions.
      */
 
-    def split(numberOfPartitions: Int, intermediatePath: String, prioritiseIntermediatePath: Boolean)(implicit spark: SparkSession): DataFrame = {
-      val rawInputDf = dataFrame
-      if (!prioritiseIntermediatePath) {
-        defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
+    def distributedLoad(numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]): DataFrame = {
+      val valPrioritiseIntermediatePath = prioritiseIntermediatePath match {
+        case Some(priority) => priority
+        case None => true
+      }
+
+      val valNumberOfPartitions = numberOfPartitions match {
+        case Some(numberOfPartitions) => numberOfPartitions
+        case None => 200
+      }
+
+
+      val spark = dataFrame.sparkSession
+      if (!valPrioritiseIntermediatePath) {
+        defaultSplit(valNumberOfPartitions, intermediatePath)
       }
       else {
         val intermediateDf = util.Try {
@@ -105,16 +116,18 @@ object DataFrameOps {
           case Success(df) => df
           case Failure(exception) =>
             logger.log.info("Warning : " + exception.getMessage + "\ncontinuing with default splitting strategy!")
-            defaultSplit(rawInputDf, numberOfPartitions, intermediatePath)
+            defaultSplit(valNumberOfPartitions, intermediatePath)
         }
       }
     }
 
     /*
-    Default Splitting strategy, takes Raw Input Dataframe , re-partitions it and returns it for further processing.
+    Default Splitting strategy, takes Raw Input Dataframe, re-partitions it, writes the partitioned dataframe
+    to intermediate path, loads the dataframe present at intermediate path and returns it for further processing.
      */
-    def defaultSplit(rawInputDf: DataFrame, numberOfPartitions: Int, intermediatePath: String)(implicit spark: SparkSession): DataFrame = {
-      val partitionedDf = rawInputDf.repartition(numberOfPartitions)
+    def defaultSplit(numberOfPartitions: Int, intermediatePath: String): DataFrame = {
+      val spark = dataFrame.sparkSession
+      val partitionedDf = dataFrame.repartition(numberOfPartitions)
       ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedDf)
       ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
     }

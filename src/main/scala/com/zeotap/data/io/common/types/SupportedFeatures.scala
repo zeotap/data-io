@@ -54,8 +54,12 @@ object SupportedFeatures {
 
   final case class LatestPaths[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
 
-  //Dataframe-specific features
-  final case class Split[A](numberOfPartitions:Int,intermediatePath:String,prioritiseIntermediatePath:Boolean) extends SupportedFeatures[A]
+  /*
+  This feature tries to handle the cases when there is single partitioned data is given as input,
+  and the computation occurs on a single node only. Objective is before loading such kind of data for computation
+  firstly we would partition the data and write it onto some path, then load this partitioned data and proceed with the computation.
+   */
+  final case class DistributedLoad[A](numberOfPartitions:Option[Int],intermediatePath:String,prioritiseIntermediatePath:Option[Boolean]) extends SupportedFeatures[A]
 
   // DataFrame-specific features
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]
