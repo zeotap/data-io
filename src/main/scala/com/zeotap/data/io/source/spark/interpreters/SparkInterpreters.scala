@@ -53,11 +53,12 @@ object SparkInterpreters {
     }
   }
 
-  val dataFrameInterpreter: FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
+  def dataFrameInterpreter: FunctionK[SupportedFeatures, SparkDataFrame] = new FunctionK[SupportedFeatures, SparkDataFrame] {
     override def apply[A](feature: SupportedFeatures[A]): SparkDataFrame[A] = State { sparkDataFrame =>
       val dataFrame: DataFrame = feature match {
         case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
         case AddCreationTimestamp(operation, inputColumn, outputColumn) => sparkDataFrame.appendRawTsToDataFrame(operation, inputColumn, outputColumn)
+        case DistributedLoad(numberOfPartitions, intermediatePath, prioritiseIntermediatePath) => sparkDataFrame.distributedLoad(numberOfPartitions, intermediatePath, prioritiseIntermediatePath)
         case _ => sparkDataFrame
       }
       (dataFrame, sparkDataFrame.asInstanceOf[A])

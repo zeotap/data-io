@@ -26,6 +26,7 @@ object BeamInterpreters {
         case Driver(driver) => pCollectionReader.option("driver", driver)
         case TableName(tableName) => pCollectionReader.option("query", f"select * from $tableName")
         case Query(query) => pCollectionReader.option("query", query)
+        case DistributedLoad(_, _, _) => throw new IllegalArgumentException("This Feature is not yet supported in Beam!")
         case _ => pCollectionReader
       }
       (reader, pCollectionReader.asInstanceOf[A])
