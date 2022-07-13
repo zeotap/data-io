@@ -1,14 +1,13 @@
 package com.zeotap.data.io.source.spark.constructs
 
 import com.zeotap.data.io.common.types.{DataType, OptionalColumn, Overwrite}
-import com.zeotap.data.io.common.utils.CloudStorePathMetaGenerator
+import com.zeotap.data.io.common.utils.{CloudStorePathMetaGenerator, logger}
 import com.zeotap.data.io.sink.spark.writer.ParquetSparkWriter
 import com.zeotap.data.io.source.spark.loader.ParquetSparkLoader
-import org.apache.log4j.Logger
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
-import org.apache.spark.sql.{DataFrame}
+import org.apache.spark.sql.DataFrame
 
 import scala.util.{Failure, Success}
 
@@ -79,7 +78,8 @@ object DataFrameOps {
 
     /**
      * Partitions given dataframe into number of partitions provided and writes the
-     * partitioned dataframe to the intermediate path provided, so that parallel processing can take place.
+     * partitioned dataframe to the intermediate path provided (partitioning happens only if the intermediate data is not already present),
+     * so that parallel processing can take place.
      *
      * @param numberOfPartitions         is the number of partitions we want in the dataframe.
      * @param intermediatePath           is the intermediate path in which the partitioned data frame is written.
@@ -95,28 +95,20 @@ object DataFrameOps {
         case None => true
       }
 
-      val valNumberOfPartitions = numberOfPartitions match {
-        case Some(numberOfPartitions) => numberOfPartitions
-        case None => 200
-      }
-
-
       val spark = dataFrame.sparkSession
       if (!valPrioritiseIntermediatePath) {
-        defaultSplit(valNumberOfPartitions, intermediatePath)
+        defaultSplit(numberOfPartitions, intermediatePath)
       }
       else {
         val intermediateDf = util.Try {
-          val df: DataFrame = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
-          if (df.isEmpty) throw new IllegalArgumentException("Intermediate Data at " + intermediatePath + " is empty!")
-          else df
+          ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
         }
 
         intermediateDf match {
           case Success(df) => df
           case Failure(exception) =>
-            logger.log.info("Warning : " + exception.getMessage + "\ncontinuing with default splitting strategy!")
-            defaultSplit(valNumberOfPartitions, intermediatePath)
+            logger.log.info(s"Failed to load data from $intermediatePath " + exception.getMessage + " proceeding with default split strategy!")
+            defaultSplit(numberOfPartitions, intermediatePath)
         }
       }
     }
@@ -125,16 +117,16 @@ object DataFrameOps {
     Default Splitting strategy, takes Raw Input Dataframe, re-partitions it, writes the partitioned dataframe
     to intermediate path, loads the dataframe present at intermediate path and returns it for further processing.
      */
-    def defaultSplit(numberOfPartitions: Int, intermediatePath: String): DataFrame = {
+    def defaultSplit(numberOfPartitions: Option[Int], intermediatePath: String): DataFrame = {
       val spark = dataFrame.sparkSession
-      val partitionedDf = dataFrame.repartition(numberOfPartitions)
+      val valNumberOfPartitions = numberOfPartitions match {
+        case Some(partitions) => partitions
+        case None => 200
+      }
+      val partitionedDf = dataFrame.repartition(valNumberOfPartitions)
       ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedDf)
       ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
     }
   }
 
-}
-
-object logger extends Serializable {
-  @transient lazy val log: Logger = Logger.getLogger(this.getClass.getName)
 }

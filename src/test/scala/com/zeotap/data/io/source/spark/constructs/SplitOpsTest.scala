@@ -53,7 +53,7 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
   }
 
 
-  test("default split test") {
+  test("Test for default splitting when intermediate path should not be prioritised") {
 
     val numberOfPartitions = 3
     val prioritiseIntermediatePath = false
@@ -79,12 +79,18 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
     //Existing intermediate data (num of partitions = 3)
     ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(actualDf.repartition(3))
 
+    /*
+      * Aims to test the split strategy that is being followed for case when intermediate data is already present
+      * Input number of partitions for intermediate data is 3
+      * Case 1 => When we need to prioritise intermediate path, In this case output df should have 3 partitions irrespective of the fact that we've provided number of partitions as 5.
+      * Case 2 => When we need not to prioritise intermediate path, In this case output df should have 5 partitions because we provided number of partitions as 5.
+     */
     prioritiseIntermediatePathList.foreach(priority => {
       val rawInputDf = AvroSparkLoader().load(rawInputPath)
         .distributedLoad(Option(numberOfPartitions), intermediatePath, Option(priority))
         .buildUnsafe(spark)
-
-      if (priority) {
+      //here priority defines whether we need to prioritise the intermediate path or not.
+      if (priority.equals(true)) {
         assertEquals(rawInputDf.rdd.getNumPartitions, 3)
         assertDataFrameEquality(actualDf, rawInputDf, "DeviceId")
       } else {
