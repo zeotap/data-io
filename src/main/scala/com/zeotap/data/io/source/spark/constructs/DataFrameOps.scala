@@ -1,7 +1,7 @@
 package com.zeotap.data.io.source.spark.constructs
 
 import com.zeotap.data.io.common.types.{DataType, OptionalColumn, Overwrite}
-import com.zeotap.data.io.common.utils.{CloudStorePathMetaGenerator, logger}
+import com.zeotap.data.io.common.utils.{CloudStorePathMetaGenerator, Logger}
 import com.zeotap.data.io.sink.spark.writer.ParquetSparkWriter
 import com.zeotap.data.io.source.spark.loader.ParquetSparkLoader
 import com.zeotap.data.io.source.utils.DataPickupUtils.{getFileSystem, pathExists}
@@ -101,7 +101,7 @@ object DataFrameOps {
         Try(ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)) match {
           case Success(data) => data
           case Failure(e) =>
-            logger.log.info(s"Failed to load data from $intermediatePath! \nError: ${e.getMessage}  \nProceeding with default split strategy!")
+            Logger.log.info(s"Failed to load data from $intermediatePath! \nError: ${e.getMessage}  \nProceeding with default split strategy!")
             defaultSplit(numberOfPartitions, intermediatePath)
         }
       }
