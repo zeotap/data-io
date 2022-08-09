@@ -4,12 +4,13 @@ import com.zeotap.data.io.common.types.{DataType, OptionalColumn, Overwrite}
 import com.zeotap.data.io.common.utils.{CloudStorePathMetaGenerator, logger}
 import com.zeotap.data.io.sink.spark.writer.ParquetSparkWriter
 import com.zeotap.data.io.source.spark.loader.ParquetSparkLoader
+import com.zeotap.data.io.source.utils.DataPickupUtils.{getFileSystem, pathExists}
+import org.apache.spark.sql.DataFrame
 import org.apache.spark.sql.expressions.UserDefinedFunction
 import org.apache.spark.sql.functions._
 import org.apache.spark.sql.types.StringType
-import org.apache.spark.sql.DataFrame
 
-import scala.util.{Failure, Success}
+import scala.util.{Failure, Success, Try}
 
 object DataFrameOps {
 
@@ -90,41 +91,31 @@ object DataFrameOps {
      */
 
     def distributedLoad(numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]): DataFrame = {
-      val valPrioritiseIntermediatePath = prioritiseIntermediatePath match {
-        case Some(priority) => priority
-        case None => true
-      }
-
+      val intermediateDataPriority = prioritiseIntermediatePath getOrElse true
+      val successFilePath = intermediatePath + "/_SUCCESS"
       val spark = dataFrame.sparkSession
-      if (!valPrioritiseIntermediatePath) {
+      if (!intermediateDataPriority || !pathExists(successFilePath, getFileSystem(successFilePath))) {
         defaultSplit(numberOfPartitions, intermediatePath)
       }
       else {
-        val intermediateDf = util.Try {
-          ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
-        }
-
-        intermediateDf match {
-          case Success(df) => df
-          case Failure(exception) =>
-            logger.log.info(s"Failed to load data from $intermediatePath " + exception.getMessage + " proceeding with default split strategy!")
+        Try(ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)) match {
+          case Success(data) => data
+          case Failure(e) =>
+            logger.log.info(s"Failed to load data from $intermediatePath! \nError: ${e.getMessage}  \nProceeding with default split strategy!")
             defaultSplit(numberOfPartitions, intermediatePath)
         }
       }
     }
 
     /*
-    Default Splitting strategy, takes Raw Input Dataframe, re-partitions it, writes the partitioned dataframe
-    to intermediate path, loads the dataframe present at intermediate path and returns it for further processing.
+    * Default Splitting strategy, takes Raw Input Dataframe, re-partitions it, writes the partitioned dataframe
+    * to intermediate path, loads the dataframe present at intermediate path and returns it for further processing.
      */
     def defaultSplit(numberOfPartitions: Option[Int], intermediatePath: String): DataFrame = {
       val spark = dataFrame.sparkSession
-      val valNumberOfPartitions = numberOfPartitions match {
-        case Some(partitions) => partitions
-        case None => 200
-      }
-      val partitionedDf = dataFrame.repartition(valNumberOfPartitions)
-      ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedDf)
+      val numberOfPartitionsRequired = numberOfPartitions getOrElse 200
+      val partitionedData = dataFrame.repartition(numberOfPartitionsRequired)
+      ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedData)
       ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
     }
   }

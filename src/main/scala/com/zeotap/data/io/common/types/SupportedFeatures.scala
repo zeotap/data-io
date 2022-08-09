@@ -55,11 +55,18 @@ object SupportedFeatures {
   final case class LatestPaths[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
 
   /*
-  This feature tries to handle the cases when there is single partitioned data is given as input,
-  and the computation occurs on a single node only. Objective is before loading such kind of data for computation
-  firstly we would partition the data and write it onto some path, then load this partitioned data and proceed with the computation.
-   */
-  final case class DistributedLoad[A](numberOfPartitions:Option[Int],intermediatePath:String,prioritiseIntermediatePath:Option[Boolean]) extends SupportedFeatures[A]
+  Problem :
+  * Custom handling for Single File Issue - a case where only one large data file is present (say 10gb) and consequently would only load the data on one executor (apache spark) and try all computations on that node essentially losing all advantages of a distributed framework.
+
+  Feature :
+  * For Apache Spark, resolution is before loading such kind of data for computation,
+  * We first partition the data and write it onto some intermediate path, then load this partitioned data and proceed with the computation.
+  * We decide the number of partition by passing an optional parameter numberOfPartitions, the default value is 200
+  * We silently always load the data from this intermediate path if it is present (We determine presence using _SUCCESS file)
+  * If not present, we always partition the data into this intermediate path and consequently load from there.
+  * We can change this behaviour by passing an optional parameter prioritiseIntermediatePath (Boolean) as false which forces the repartition even if some data is present at intermediate path.
+  */
+  final case class DistributedLoad[A](numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]) extends SupportedFeatures[A]
 
   // DataFrame-specific features
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]

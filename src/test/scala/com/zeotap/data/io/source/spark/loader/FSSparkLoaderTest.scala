@@ -307,7 +307,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     val intermediateDf = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
 
-    assert(3,intermediateDf.rdd.getNumPartitions)
+    assert(3, intermediateDf.rdd.getNumPartitions)
     assert(3, df.rdd.getNumPartitions)
     assertDataFrameEquality(expectedDf, df, "DeviceId")
     assertDataFrameEquality(expectedDf, intermediateDf, "DeviceId")
