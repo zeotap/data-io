@@ -64,9 +64,11 @@ object SupportedFeatures {
   * We decide the number of partition by passing an optional parameter numberOfPartitions, the default value is 200
   * We silently always load the data from this intermediate path if it is present (We determine presence using _SUCCESS file)
   * If not present, we always partition the data into this intermediate path and consequently load from there.
-  * We can change this behaviour by passing an optional parameter prioritiseIntermediatePath (Boolean) as false which forces the repartition even if some data is present at intermediate path.
+  * We can change the behaviour by passing an optional parameter prioritiseIntermediatePath (Boolean) as false which forces the repartition even if some data is present at intermediate path.
+  *
+  * Imp: Although we are re-partitioning the dataset, the user should tune the spark prop `spark.default.parallelism` for better performance.
   */
-  final case class DistributedLoad[A](numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]) extends SupportedFeatures[A]
+  final case class DistributedLoad[A](intermediatePath: String, numberOfPartitions: Int, prioritiseIntermediatePath: Boolean) extends SupportedFeatures[A]
 
   // DataFrame-specific features
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]

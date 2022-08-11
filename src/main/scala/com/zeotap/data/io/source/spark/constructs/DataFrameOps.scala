@@ -90,19 +90,18 @@ object DataFrameOps {
      * @return Returns Dataframe with specified number of partitions.
      */
 
-    def distributedLoad(numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]): DataFrame = {
-      val intermediateDataPriority = prioritiseIntermediatePath getOrElse true
+    def distributedLoad(intermediatePath: String, numberOfPartitions: Int, prioritiseIntermediatePath: Boolean): DataFrame = {
       val successFilePath = intermediatePath + "/_SUCCESS"
       val spark = dataFrame.sparkSession
-      if (!intermediateDataPriority || !pathExists(successFilePath, getFileSystem(successFilePath))) {
-        defaultSplit(numberOfPartitions, intermediatePath)
+      if (!prioritiseIntermediatePath || !pathExists(successFilePath, getFileSystem(successFilePath))) {
+        defaultSplit(intermediatePath, numberOfPartitions)
       }
       else {
         Try(ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)) match {
           case Success(data) => data
           case Failure(e) =>
             Logger.log.info(s"Failed to load data from $intermediatePath! \nError: ${e.getMessage}  \nProceeding with default split strategy!")
-            defaultSplit(numberOfPartitions, intermediatePath)
+            defaultSplit(intermediatePath, numberOfPartitions)
         }
       }
     }
@@ -111,10 +110,9 @@ object DataFrameOps {
     * Default Splitting strategy, takes Raw Input Dataframe, re-partitions it, writes the partitioned dataframe
     * to intermediate path, loads the dataframe present at intermediate path and returns it for further processing.
      */
-    def defaultSplit(numberOfPartitions: Option[Int], intermediatePath: String): DataFrame = {
+    def defaultSplit(intermediatePath: String, numberOfPartitions: Int): DataFrame = {
       val spark = dataFrame.sparkSession
-      val numberOfPartitionsRequired = numberOfPartitions getOrElse 200
-      val partitionedData = dataFrame.repartition(numberOfPartitionsRequired)
+      val partitionedData = dataFrame.repartition(numberOfPartitions)
       ParquetSparkWriter().addSaveMode(Overwrite).save(intermediatePath).buildUnsafe(partitionedData)
       ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
     }

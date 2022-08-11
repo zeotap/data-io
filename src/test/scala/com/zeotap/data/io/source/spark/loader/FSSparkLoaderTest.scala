@@ -302,7 +302,7 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val df = new FSSparkLoader()
       .addFormat(Avro)
       .lookBack("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "19"), 3)
-      .distributedLoad(Option(numberOfPartitions), intermediatePath, Option(prioritiseIntermediatePath))
+      .distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath)
       .buildUnsafe(spark)
 
     val intermediateDf = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)

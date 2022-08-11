@@ -58,7 +58,7 @@ object SparkInterpreters {
       val dataFrame: DataFrame = feature match {
         case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
         case AddCreationTimestamp(operation, inputColumn, outputColumn) => sparkDataFrame.appendRawTsToDataFrame(operation, inputColumn, outputColumn)
-        case DistributedLoad(numberOfPartitions, intermediatePath, prioritiseIntermediatePath) => sparkDataFrame.distributedLoad(numberOfPartitions, intermediatePath, prioritiseIntermediatePath)
+        case DistributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath) => sparkDataFrame.distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath)
         case _ => sparkDataFrame
       }
       (dataFrame, sparkDataFrame.asInstanceOf[A])

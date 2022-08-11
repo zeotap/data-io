@@ -44,7 +44,7 @@ object SupportedFeaturesHelper {
 
   def loadPaths[A](paths: List[String]): SupportedFeaturesF[A] = liftF(LoadPaths[A](paths))
 
-  def distributedLoad[A](numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]): SupportedFeaturesF[A] = liftF(DistributedLoad(numberOfPartitions, intermediatePath, prioritiseIntermediatePath))
+  def distributedLoad[A](intermediatePath: String, numberOfPartitions: Int, prioritiseIntermediatePath: Boolean): SupportedFeaturesF[A] = liftF(DistributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath))
 
   def lookBack[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer): SupportedFeaturesF[A] = liftF(LookBack[A](pathTemplate, parameters, lookBackWindow))
 

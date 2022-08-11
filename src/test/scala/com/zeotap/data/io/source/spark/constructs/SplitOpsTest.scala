@@ -6,6 +6,7 @@ import com.zeotap.data.io.common.types.Overwrite
 import com.zeotap.data.io.sink.spark.writer.ParquetSparkWriter
 import com.zeotap.data.io.source.spark.loader.AvroSparkLoader
 import org.apache.commons.io.FileUtils
+import org.apache.spark.SparkConf
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.junit.Assert.assertEquals
@@ -18,9 +19,12 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
   val rawInputPath: String = "src/test/resources/custom-input-format/yr=2022/mon=03/dt=26"
   val intermediatePath: String = "src/test/resources/custom-input-format/yr=2022/mon=03/dt=26_intermediate"
 
+  override def conf: SparkConf = super.conf.set("spark.default.parallelism", "500")
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    FileUtils.deleteQuietly(new File(rawInputPath))
+    FileUtils.deleteQuietly(new File(intermediatePath))
 
     val testSchema = List(
       StructField("Common_DataPartnerID", IntegerType, nullable = true),
@@ -28,28 +32,37 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
       StructField("Demographic_Country", StringType, nullable = true),
       StructField("Common_TS", StringType, nullable = true)
     )
-
-    val sampleDataFrame = spark.createDataFrame(
-      spark.sparkContext.parallelize(Seq(
-        Row(1, "1", "India", "1504679559"),
-        Row(1, "2", "India", "1504679359"),
-        Row(1, "3", "Spain", "1504679459"),
-        Row(1, "4", "India", "1504679659"),
-        Row(2, "1", "India", "1504679759"),
-        Row(2, "2", "India", "1504679359"),
-        Row(2, "3", "Spain", "1504679959"),
-        Row(2, "4", "India", "1504679859")
-      )),
-      StructType(testSchema)
+    val rowList = List(
+      Row(1, "1", "India", "1504679559"),
+      Row(1, "2", "India", "1504679359"),
+      Row(1, "3", "Spain", "1504679459"),
+      Row(1, "4", "India", "1504679659"),
+      Row(2, "1", "India", "1504679759"),
+      Row(2, "2", "India", "1504679359"),
+      Row(2, "3", "Spain", "1504679959"),
+      Row(2, "4", "India", "1504679859")
     )
 
-    sampleDataFrame.write.format("avro").save(rawInputPath)
+    val dataFrameRows = (0 to 1000).toList.foldLeft(Seq[Row]())((rowSeq, ind) => {
+      rowSeq :+ rowList(ind % 8)
+    })
+
+    val sampleDataFrame = spark.createDataFrame(spark.sparkContext.parallelize(dataFrameRows), StructType(testSchema))
+    sampleDataFrame.coalesce(1).write.format("avro").save(rawInputPath)
   }
 
   override def afterAll(): Unit = {
     super.afterAll()
-    FileUtils.forceDelete(new File(rawInputPath))
-    FileUtils.forceDelete(new File(intermediatePath))
+    FileUtils.deleteQuietly(new File(rawInputPath))
+    FileUtils.deleteQuietly(new File(intermediatePath))
+  }
+
+  test("Default splitting strategy with intermediatePath parameter only") {
+    val expectedDf = AvroSparkLoader().load(rawInputPath).buildUnsafe(spark)
+    val actualDf = AvroSparkLoader().load(rawInputPath).distributedLoad(intermediatePath).buildUnsafe(spark)
+
+    assertDataFrameEquality(actualDf, expectedDf, sortColumn = "DeviceId")
+    assertEquals(200, actualDf.rdd.getNumPartitions)
   }
 
 
@@ -62,7 +75,7 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
 
     val rawInputDf = AvroSparkLoader()
       .load(rawInputPath)
-      .distributedLoad(Option(numberOfPartitions), intermediatePath, Option(prioritiseIntermediatePath))
+      .distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath)
       .buildUnsafe(spark)
 
     assertEquals(rawInputDf.rdd.getNumPartitions, 3)
@@ -87,7 +100,7 @@ class SplitOpsTest extends FunSuite with DataFrameSuiteBase {
      */
     prioritiseIntermediatePathList.foreach(priority => {
       val rawInputDf = AvroSparkLoader().load(rawInputPath)
-        .distributedLoad(Option(numberOfPartitions), intermediatePath, Option(priority))
+        .distributedLoad(intermediatePath, numberOfPartitions, priority)
         .buildUnsafe(spark)
       //here priority defines whether we need to prioritise the intermediate path or not.
       if (priority.equals(true)) {

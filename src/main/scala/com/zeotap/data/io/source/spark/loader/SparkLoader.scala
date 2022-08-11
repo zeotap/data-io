@@ -51,8 +51,8 @@ class SparkLoader(
    * @return Returns Dataframe with specified number of partitions.
    */
 
-  def distributedLoad(numberOfPartitions: Option[Int], intermediatePath: String, prioritiseIntermediatePath: Option[Boolean]): FSSparkLoader =
-    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.distributedLoad(numberOfPartitions, intermediatePath, prioritiseIntermediatePath))
+  def distributedLoad(intermediatePath: String, numberOfPartitions: Int = 200, prioritiseIntermediatePath: Boolean = true): FSSparkLoader =
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath))
 
 
   /**
