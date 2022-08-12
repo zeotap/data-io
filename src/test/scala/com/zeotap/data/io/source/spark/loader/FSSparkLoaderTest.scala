@@ -1,8 +1,8 @@
 package com.zeotap.data.io.source.spark.loader
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
-import com.zeotap.data.io.common.types._
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
+import com.zeotap.data.io.common.types._
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
@@ -268,4 +268,49 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     assertDataFrameEquality(expectedDf, df, "DeviceId")
   }
 
+  test("Test for multiple options with split") {
+    val expectedSchema = List(
+      StructField("Common_DataPartnerID", IntegerType, nullable = true),
+      StructField("DeviceId", StringType, nullable = true),
+      StructField("Demographic_Country", StringType, nullable = true),
+      StructField("Common_TS", StringType, nullable = true),
+      StructField("Demographic_Gender", StringType, nullable = true)
+    )
+
+    val expectedDf = spark.createDataFrame(
+      spark.sparkContext.parallelize(Seq(
+        Row(1, "1", "India", "1504679559", null),
+        Row(1, "2", "India", "1504679359", null),
+        Row(1, "3", "Spain", "1504679459", null),
+        Row(1, "4", "India", "1504679659", null),
+        Row(1, "5", "France", "1504679559", null),
+        Row(1, "6", "Germany", "1504679359", null),
+        Row(1, "7", "Italy", "1504679459", null),
+        Row(1, "8", "Belgium", "1504679659", null),
+        Row(1, "5", "France", "1504679559", "Male"),
+        Row(1, "6", "Germany", "1504679359", "Female"),
+        Row(1, "7", "Italy", "1504679459", "Female"),
+        Row(1, "8", "Belgium", "1504679659", "Male")
+      )),
+      StructType(expectedSchema)
+    )
+
+    val numberOfPartitions = 3
+    val intermediatePath = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=19_intermediate"
+    val prioritiseIntermediatePath = true
+
+    val df = new FSSparkLoader()
+      .addFormat(Avro)
+      .lookBack("src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}", Map("YR" -> "2021", "MON" -> "07", "DT" -> "19"), 3)
+      .distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath)
+      .buildUnsafe(spark)
+
+    val intermediateDf = ParquetSparkLoader().load(intermediatePath).buildUnsafe(spark)
+
+    assert(3, intermediateDf.rdd.getNumPartitions)
+    assert(3, df.rdd.getNumPartitions)
+    assertDataFrameEquality(expectedDf, df, "DeviceId")
+    assertDataFrameEquality(expectedDf, intermediateDf, "DeviceId")
+    FileUtils.forceDelete(new File(intermediatePath))
+  }
 }

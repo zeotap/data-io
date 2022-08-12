@@ -54,6 +54,22 @@ object SupportedFeatures {
 
   final case class LatestPaths[A](pathTemplate: String, parameters: Map[String, String], relativeToCurrentDate: Boolean) extends SupportedFeatures[A]
 
+  /*
+  Problem :
+  * Custom handling for Single File Issue - a case where only one large data file is present (say 10gb) and consequently would only load the data on one executor (apache spark) and try all computations on that node essentially losing all advantages of a distributed framework.
+
+  Feature :
+  * For Apache Spark, resolution is before loading such kind of data for computation,
+  * We first partition the data and write it onto some intermediate path, then load this partitioned data and proceed with the computation.
+  * We decide the number of partition by passing an optional parameter numberOfPartitions, the default value is 200
+  * We silently always load the data from this intermediate path if it is present (We determine presence using _SUCCESS file)
+  * If not present, we always partition the data into this intermediate path and consequently load from there.
+  * We can change the behaviour by passing an optional parameter prioritiseIntermediatePath (Boolean) as false which forces the repartition even if some data is present at intermediate path.
+  *
+  * Imp: Although we are re-partitioning the dataset, the user should tune the spark prop `spark.default.parallelism` for better performance.
+  */
+  final case class DistributedLoad[A](intermediatePath: String, numberOfPartitions: Int, prioritiseIntermediatePath: Boolean) extends SupportedFeatures[A]
+
   // DataFrame-specific features
   final case class AddOptionalColumns[A](columns: List[OptionalColumn]) extends SupportedFeatures[A]
 

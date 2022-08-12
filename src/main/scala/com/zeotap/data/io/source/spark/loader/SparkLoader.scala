@@ -1,7 +1,7 @@
 package com.zeotap.data.io.source.spark.loader
 
-import com.zeotap.data.io.common.types.{OptionalColumn, SourceLoader, SupportedFeaturesHelper}
 import com.zeotap.data.io.common.types.SupportedFeaturesHelper.SupportedFeaturesF
+import com.zeotap.data.io.common.types.{OptionalColumn, SourceLoader, SupportedFeaturesHelper}
 import com.zeotap.data.io.common.utils.CommonUtils.handleException
 import com.zeotap.data.io.source.utils.SparkLoaderUtils
 import org.apache.spark.sql.{DataFrame, DataFrameReader, SparkSession}
@@ -40,6 +40,20 @@ class SparkLoader(
    */
   def addOptionalColumns(columns: List[OptionalColumn]): SparkLoader =
     new SparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.addOptionalColumns(columns))
+
+  /**
+   * Partitions given dataframe into number of partitions provided, so that parallel processing can take place.
+   *
+   * @param numberOfPartitions         is number of partitions we want in the dataframe.
+   * @param intermediatePath           is the intermediate path in which the partitioned data frame is written.
+   * @param prioritiseIntermediatePath is boolean value which denotes whether the intermediate path (i.e already partitioned path)
+   *                                   needs to prioritised or should we force repartition.
+   * @return Returns Dataframe with specified number of partitions.
+   */
+
+  def distributedLoad(intermediatePath: String, numberOfPartitions: Int = 200, prioritiseIntermediatePath: Boolean = true): FSSparkLoader =
+    new FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties :+ SupportedFeaturesHelper.distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath))
+
 
   /**
    * Returns a `DataFrame` based on all the provided reader and dataFrame properties
