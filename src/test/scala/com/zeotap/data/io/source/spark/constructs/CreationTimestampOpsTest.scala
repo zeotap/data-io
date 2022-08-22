@@ -253,4 +253,20 @@ class CreationTimestampOpsTest extends FunSuite with DataFrameSuiteBase {
     assertThrows[IllegalArgumentException](dataFrame.appendRawTsToDataFrame("wrongOperation", None, "random"))
   }
 
+  test("RawTS When Input Path contains *"){
+
+    val inputPathWithAsterisk: String =  "src/test/resources/custom-input-format/yr=2021/mon=*"
+    val inputPathList1 = Array(inputPathWithAsterisk)
+
+    val inputPathWithoutAsterisk: String = "src/test/resources/custom-input-format/yr=2021/mon=07"
+    val inputPathList2 = Array(inputPathWithoutAsterisk)
+
+    val cloudStorePathMetaGenerator = new CloudStorePathMetaGenerator
+
+    val rawTsMap1 = cloudStorePathMetaGenerator.partFileRawTsMapGenerator(inputPathList1)
+    val rawTsMap2 = cloudStorePathMetaGenerator.partFileRawTsMapGenerator(inputPathList2)
+
+    assert(rawTsMap1 == rawTsMap2 && rawTsMap1.nonEmpty)
+  }
+
 }
