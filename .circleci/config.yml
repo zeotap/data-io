@@ -144,4 +144,4 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              ignore: /^(development|master|surya/temp-build)$/
+              ignore: /^(development|master|zeotap-development)$/
