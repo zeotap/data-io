@@ -147,4 +147,4 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              ignore: /^(development|master|circle-ci)$/
+              ignore: /^development|master|circle-ci$/
