@@ -28,7 +28,9 @@ object SparkInterpreters {
         case AvroSchema(jsonSchema) => dataFrameReader.option("avroSchema", jsonSchema)
         case MergeSchema() => dataFrameReader.option("mergeSchema", "true")
         case ConnectionProperties(url, user, password) => dataFrameReader.option("url", url).option("user", user).option("password", password)
+        case Driver(driver) => dataFrameReader.option("driver", driver)
         case TableName(tableName) => dataFrameReader.option("dbtable", tableName)
+        case StringType(stringType) => dataFrameReader.option("stringtype", stringType)
         case Query(query) => dataFrameReader.option("query", query)
         case CustomSchema(schema) => dataFrameReader.option("customSchema", schema)
         case _ => dataFrameReader
@@ -56,6 +58,7 @@ object SparkInterpreters {
       val dataFrame: DataFrame = feature match {
         case AddOptionalColumns(columns) => sparkDataFrame.addOptionalColumns(columns)
         case AddCreationTimestamp(operation, inputColumn, outputColumn) => sparkDataFrame.appendRawTsToDataFrame(operation, inputColumn, outputColumn)
+        case DistributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath) => sparkDataFrame.distributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath)
         case _ => sparkDataFrame
       }
       (dataFrame, sparkDataFrame.asInstanceOf[A])

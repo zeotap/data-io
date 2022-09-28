@@ -28,7 +28,11 @@ object SupportedFeaturesHelper {
 
   def connectionProperties[A](url: String, user: String, password: String): SupportedFeaturesF[A] = liftF(ConnectionProperties[A](url, user, password))
 
+  def driver[A](driver: String): SupportedFeaturesF[A] = liftF(Driver[A](driver))
+
   def tableName[A](tableName: String): SupportedFeaturesF[A] = liftF(TableName[A](tableName))
+
+  def stringType[A](stringType: String): SupportedFeaturesF[A] = liftF(StringType[A](stringType))
 
   def query[A](query: String): SupportedFeaturesF[A] = liftF(Query[A](query))
 
@@ -39,6 +43,8 @@ object SupportedFeaturesHelper {
   def loadPath[A](path: String): SupportedFeaturesF[A] = liftF(LoadPath[A](path))
 
   def loadPaths[A](paths: List[String]): SupportedFeaturesF[A] = liftF(LoadPaths[A](paths))
+
+  def distributedLoad[A](intermediatePath: String, numberOfPartitions: Int, prioritiseIntermediatePath: Boolean): SupportedFeaturesF[A] = liftF(DistributedLoad(intermediatePath, numberOfPartitions, prioritiseIntermediatePath))
 
   def lookBack[A](pathTemplate: String, parameters: Map[String, String], lookBackWindow: Integer): SupportedFeaturesF[A] = liftF(LookBack[A](pathTemplate, parameters, lookBackWindow))
 
