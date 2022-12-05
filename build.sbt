@@ -28,7 +28,7 @@ libraryDependencies ++= Seq(
     "org.postgresql" % "postgresql" % "42.2.11",
     "org.typelevel" %% "cats-core" % "2.0.0",
     "org.typelevel" %% "cats-free" % "2.0.0",
-    "org.mockito" % "mockito-core" % "2.8.9" % Test,
+    "org.mockito" % "mockito-core" % "2.22.0" % Test,
     "org.testcontainers" % "mysql" % "1.16.0" % Test,
     "org.testcontainers" % "postgresql" % "1.16.0" % Test
 )
