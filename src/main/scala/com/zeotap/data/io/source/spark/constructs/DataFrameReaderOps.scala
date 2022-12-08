@@ -40,7 +40,7 @@ object DataFrameReaderOps {
 
     private def safeReadMultiPath(paths: List[String]): DataFrame = {
       val initialDf = dataFrameReader.load(paths.head)
-      paths.foldLeft(initialDf)((accDf, path) => {
+      paths.tail.foldLeft(initialDf)((accDf, path) => {
         val currDf = dataFrameReader.load(path)
         val prevColumns = accDf.columns.toSet
         val currColumns = currDf.columns.toSet
