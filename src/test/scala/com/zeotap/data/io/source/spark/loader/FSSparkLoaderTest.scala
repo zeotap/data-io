@@ -309,8 +309,8 @@ class FSSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
 
     assert(3, intermediateDf.rdd.getNumPartitions)
     assert(3, df.rdd.getNumPartitions)
-    assertDataFrameEquality(expectedDf, df, "DeviceId")
-    assertDataFrameEquality(expectedDf, intermediateDf, "DeviceId")
+    assertDataFrameEquality(expectedDf, df)
+    assertDataFrameEquality(expectedDf, intermediateDf)
     FileUtils.forceDelete(new File(intermediatePath))
   }
 }

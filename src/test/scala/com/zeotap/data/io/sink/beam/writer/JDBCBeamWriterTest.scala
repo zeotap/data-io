@@ -153,7 +153,7 @@ class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAnd
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(expectedDf, actualDf, "deviceid")
+    assertDataFrameEquality(expectedDf, actualDf)
   }
 
   test("JDBC write test with existing rows") {
@@ -192,7 +192,7 @@ class JDBCBeamWriterTest extends FunSuite with DataFrameSuiteBase with BeforeAnd
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(expectedDf, actualDf, "deviceid")
+    assertDataFrameEquality(expectedDf, actualDf)
   }
 
 }

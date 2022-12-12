@@ -65,7 +65,7 @@ class JDBCSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       .load()
       .buildUnsafe(spark)
 
-    assertDataFrameEquality(expectedDf, df, "id")
+    assertDataFrameEquality(expectedDf, df)
     container.stop()
   }
 
@@ -111,7 +111,7 @@ class JDBCSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
       .load()
       .buildUnsafe(spark)
 
-    assertDataFrameEquality(expectedDf, df, "id")
+    assertDataFrameEquality(expectedDf, df)
     container.stop()
   }
 

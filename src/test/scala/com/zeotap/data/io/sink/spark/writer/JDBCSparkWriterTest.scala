@@ -39,7 +39,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
   }
 
   test("basicWriteTest") {
-    val schema = List(
+    val testSchema = List(
       StructField("id", IntegerType, true),
       StructField("name", StringType, true)
     )
@@ -50,7 +50,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
         Row(2,"def"),
         Row(3,"ghi")
       )),
-      StructType(schema)
+      StructType(testSchema)
     )
 
     val eitherExceptionOrSave = JDBCSparkWriter()
@@ -69,7 +69,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(df, actualDf, "id")
+    assertDataFrameEquality(df, actualDf)
   }
 
   test("errorIfExistsTest") {
@@ -165,7 +165,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(df1, actualDf, "id")
+    assertDataFrameEquality(df1, actualDf)
   }
 
   test("appendTest") {
@@ -217,7 +217,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(unionByName(df1, df2), actualDf, "id")
+    assertDataFrameEquality(unionByName(df1, df2), actualDf)
   }
 
   test("overwriteTest") {
@@ -269,7 +269,7 @@ class JDBCSparkWriterTest extends FunSuite with BeforeAndAfterEach with DataFram
       .option("dbtable", "test_table")
       .load()
 
-    assertDataFrameEquality(df2, actualDf, "id")
+    assertDataFrameEquality(df2, actualDf)
   }
 
 }
