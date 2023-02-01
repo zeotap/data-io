@@ -22,6 +22,8 @@ object SparkWriter {
 
   def jdbc: JDBCSparkWriter = JDBCSparkWriter()
 
+  def delta: DeltaSparkWriter = DeltaSparkWriter()
+
 }
 
 class SparkWriter(

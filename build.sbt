@@ -3,7 +3,7 @@ name := "data-io"
 organization := "com.zeotap"
 
 scalaVersion := "2.11.12"
-version := "2.1.0"
+version := "1.2.0"
 
 import ReleaseTransformations._
 
@@ -15,6 +15,7 @@ libraryDependencies ++= Seq(
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.1",
     "com.google.cloud.spark" %% "spark-bigquery-with-dependencies" % "0.21.1",
     "com.zeotap" %% "spark-property-tests" % "2.4.3",
+    "io.delta" %% "delta-core" % "0.6.1",
     "mysql" % "mysql-connector-java" % "8.0.26",
     "org.apache.beam" % "beam-runners-direct-java" % beamVersion,
     "org.apache.beam" % "beam-sdks-java-core" % beamVersion,
