@@ -133,7 +133,7 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              only: /^zeotap-development|Akhilesh/Jfrog_Spark_3.1)$/
+              only: /^(zeotap-development|Akhilesh/Jfrog_Spark_3.1)$/
       - release:
           context: Q3-2020
           filters:
