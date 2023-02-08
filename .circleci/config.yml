@@ -27,7 +27,6 @@ jobs:
           name: Package the Jar
           command: |
             sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
-            java -version
             sbt clean test publish
       - save_cache:
           paths:
@@ -134,14 +133,14 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              only: /^(development|zeotap-development)$/
+              only: /^zeotap-development|Akhilesh/Jfrog_Spark_3.1)$/
       - release:
           context: Q3-2020
           filters:
             branches:
-              only: /^master$/
+              only: /^zeotap-master$/
       - buildonly:
           context: Q3-2020
           filters:
             branches:
-              ignore: /^(development|master|zeotap-development)$/
+              ignore: /^(development|master|zeotap-master|zeotap-development)$/
