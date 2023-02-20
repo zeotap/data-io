@@ -41,6 +41,8 @@ object SupportedFeatures {
   // JDBC Reader specific features
   final case class Query[A](query: String) extends SupportedFeatures[A]
 
+  final case class BatchSize[A](batchSize: String) extends SupportedFeatures[A]
+
   final case class CustomSchema[A](schema: String) extends SupportedFeatures[A]
 
   // Loader-specific features

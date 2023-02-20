@@ -40,4 +40,7 @@ case class JDBCSparkWriter(
   def addSaveMode(saveMode: SaveMode): JDBCSparkWriter =
     JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.addSaveMode(saveMode), writerToSinkProperties)
 
+  def batchSize(batchSize: String): JDBCSparkWriter =
+    JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.batchSize(batchSize), writerToSinkProperties)
+
 }
