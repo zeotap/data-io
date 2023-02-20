@@ -43,4 +43,7 @@ case class JDBCSparkWriter(
   def batchSize(batchSize: String): JDBCSparkWriter =
     JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.batchSize(batchSize), writerToSinkProperties)
 
+  def numPartitions(numPartitions: String): JDBCSparkWriter =
+    JDBCSparkWriter(writerProperties :+ SupportedFeaturesHelper.batchSize(numPartitions), writerToSinkProperties)
+
 }

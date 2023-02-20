@@ -43,6 +43,8 @@ object SupportedFeatures {
 
   final case class BatchSize[A](batchSize: String) extends SupportedFeatures[A]
 
+  final case class NumPartitions[A](numPartitions: String) extends SupportedFeatures[A]
+
   final case class CustomSchema[A](schema: String) extends SupportedFeatures[A]
 
   // Loader-specific features

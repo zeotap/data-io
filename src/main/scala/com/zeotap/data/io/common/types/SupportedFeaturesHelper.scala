@@ -36,6 +36,8 @@ object SupportedFeaturesHelper {
 
   def batchSize[A](batchSize: String): SupportedFeaturesF[A] = liftF(BatchSize[A](batchSize))
 
+  def numPartitions[A](numPartitions: String):  SupportedFeaturesF[A] = liftF(NumPartitions[A](numPartitions))
+
   def query[A](query: String): SupportedFeaturesF[A] = liftF(Query[A](query))
 
   def customSchema[A](schema: String): SupportedFeaturesF[A] = liftF(CustomSchema[A](schema))

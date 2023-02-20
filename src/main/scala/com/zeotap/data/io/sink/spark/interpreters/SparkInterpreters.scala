@@ -25,6 +25,7 @@ object SparkInterpreters {
         case TableName(tableName) => dataFrameWriter.option("dbtable", tableName)
         case StringType(stringType) => dataFrameWriter.option("stringtype", stringType)
         case BatchSize(batchSize) => dataFrameWriter.option("batchsize", batchSize)
+        case NumPartitions(numPartitions) => dataFrameWriter.option("numPartitions", numPartitions)
         case _ => dataFrameWriter
       }
       writer.asInstanceOf[A]
