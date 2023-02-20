@@ -134,7 +134,7 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              only: /^(development|zeotap-development|Akhilesh/jdbc-batch))$/
+              only: /^(development|zeotap-development|Akhilesh/jdbc-batch)$/
       - release:
           context: Q3-2020
           filters:
