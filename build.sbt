@@ -11,8 +11,11 @@ val sparkVersion = "2.4.3"
 val beamVersion = "2.33.0"
 
 libraryDependencies ++= Seq(
-    "com.fasterxml.jackson.module" % "jackson-module-paranamer" % "2.12.1",
-    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.1",
+    "com.fasterxml.jackson.core" % "jackson-core" % "2.6.7",
+    "com.fasterxml.jackson.core" % "jackson-annotations" % "2.6.7",
+    "com.fasterxml.jackson.module" % "jackson-module-paranamer" % "2.6.7",
+    "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.7.1",
+    "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.7.1",
     "com.google.cloud.spark" %% "spark-bigquery-with-dependencies" % "0.21.1",
     "com.zeotap" %% "spark-property-tests" % "2.4.3",
     "io.delta" %% "delta-core" % "0.6.1",
@@ -32,6 +35,14 @@ libraryDependencies ++= Seq(
     "org.mockito" % "mockito-core" % "2.8.9" % Test,
     "org.testcontainers" % "mysql" % "1.16.0" % Test,
     "org.testcontainers" % "postgresql" % "1.16.0" % Test
+)
+
+dependencyOverrides ++= Seq(
+  "com.fasterxml.jackson.core" % "jackson-core" % "2.6.7",
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.6.7",
+  "com.fasterxml.jackson.module" % "jackson-module-paranamer" % "2.6.7",
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.6.7.1",
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.6.7.1"
 )
 
 fork in Test := true
