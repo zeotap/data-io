@@ -27,7 +27,6 @@ jobs:
           name: Package the Jar
           command: |
             sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
-            export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
             java -version
             sbt clean test publish
       - save_cache:
@@ -72,7 +71,7 @@ jobs:
       - run:
           name: Package the Jar
           command: |
-            export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+            sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
             if grep -Fq "SNAPSHOT" version.sbt
             then
               sbt 'release with-defaults'
@@ -120,7 +119,7 @@ jobs:
       - run:
           name: Package the Jar
           command: |
-            export JAVA_HOME=/usr/lib/jvm/java-1.8.0-openjdk-amd64
+            sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
             sbt clean test package
       - save_cache:
           paths:
