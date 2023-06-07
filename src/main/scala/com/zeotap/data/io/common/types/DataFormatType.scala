@@ -18,6 +18,8 @@ case object JDBC extends DataFormatType
 
 case object BigQuery extends DataFormatType
 
+case object Delta extends DataFormatType
+
 object DataFormatType {
 
   def value(format: DataFormatType): String = {
@@ -30,6 +32,21 @@ object DataFormatType {
       case ORC => "orc"
       case JDBC => "jdbc"
       case BigQuery => "bigquery"
+      case Delta => "delta"
+    }
+  }
+
+  def valueOf(dataFormat: String): DataFormatType = {
+    dataFormat match {
+      case "text" => Text
+      case "csv" => CSV
+      case "json" => JSON
+      case "avro" => Avro
+      case "parquet" => Parquet
+      case "orc" => ORC
+      case "jdbc" => JDBC
+      case "bigquery" => BigQuery
+      case "delta" => Delta
     }
   }
 }

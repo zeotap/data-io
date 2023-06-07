@@ -71,6 +71,7 @@ jobs:
       - run:
           name: Package the Jar
           command: |
+            sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
             if grep -Fq "SNAPSHOT" version.sbt
             then
               sbt 'release with-defaults'
@@ -118,6 +119,7 @@ jobs:
       - run:
           name: Package the Jar
           command: |
+            sudo update-alternatives --set java /usr/lib/jvm/java-8-openjdk-amd64/jre/bin/java
             sbt clean test package
       - save_cache:
           paths:
@@ -134,7 +136,7 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              only: /^(development|zeotap-development)$/
+              only: /^(development|zeotap-development|zeotap-development-spark2)$/
       - release:
           context: Q3-2020
           filters:
@@ -144,4 +146,4 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              ignore: /^(development|master|zeotap-development)$/
+              ignore: /^(development|master|zeotap-development|zeotap-development-spark2)$/
