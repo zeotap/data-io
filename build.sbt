@@ -3,6 +3,7 @@ name := "data-io"
 organization := "com.zeotap"
 
 scalaVersion := "2.12.15"
+
 version := "2.1.0"
 
 import ReleaseTransformations._
