@@ -24,6 +24,8 @@ object SparkLoader {
 
   def bigquery: BigQuerySparkLoader = BigQuerySparkLoader()
 
+  def delta: DeltaSparkLoader = DeltaSparkLoader()
+
 }
 
 class SparkLoader(
