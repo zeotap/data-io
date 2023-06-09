@@ -35,4 +35,18 @@ object DataFormatType {
       case Delta => "delta"
     }
   }
+
+  def valueOf(dataFormat: String): DataFormatType = {
+    dataFormat match {
+      case "text" => Text
+      case "csv" => CSV
+      case "json" => JSON
+      case "avro" => Avro
+      case "parquet" => Parquet
+      case "orc" => ORC
+      case "jdbc" => JDBC
+      case "bigquery" => BigQuery
+      case "delta" => Delta
+    }
+  }
 }
