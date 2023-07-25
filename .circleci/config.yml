@@ -134,7 +134,7 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              only: /^(development|zeotap-development)$/
+              only: /^(development|zeotap-development|surya/delta-temp)$/
       - release:
           context: Q3-2020
           filters:
@@ -144,4 +144,4 @@ workflows:
           context: Q3-2020
           filters:
             branches:
-              ignore: /^(development|master|zeotap-development)$/
+              ignore: /^(development|master|zeotap-development|surya/delta-temp)$/

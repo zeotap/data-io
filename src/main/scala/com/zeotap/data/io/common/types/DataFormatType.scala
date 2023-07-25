@@ -48,5 +48,5 @@ object DataFormatType {
       case "bigquery" => BigQuery
       case "delta" => Delta
     }
-
+  }
 }
