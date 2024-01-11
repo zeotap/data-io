@@ -3,19 +3,50 @@ name := "data-io"
 organization := "com.zeotap"
 
 scalaVersion := "2.12.14"
-version := "2.0.0"
+version := sys.env("SPARK_VERSION").asInstanceOf[String] + "_2.0.0"
 
 import ReleaseTransformations._
 
-val sparkVersion = "3.1.2"
+val sparkVersionMap = Map(
+  "3.0.1" -> Map(
+    "sparkTestingBaseVersion" -> "3.0.1_1.4.7",
+    "deltaName" -> "delta-core",
+    "deltaVersion" -> "0.8.0",
+  ),
+  "3.1.2" -> Map(
+    "sparkTestingBaseVersion" -> "3.1.2_1.4.7",
+    "deltaName" -> "delta-core",
+    "deltaVersion" -> "1.0.0",
+  ),
+  "3.3.1" -> Map(
+    "sparkTestingBaseVersion" -> "3.3.1_1.4.7",
+    "deltaName" -> "delta-core",
+    "deltaVersion" -> "2.3.0",
+  ),
+  "3.4.1" -> Map(
+    "sparkTestingBaseVersion" -> "3.4.1_1.4.7",
+    "deltaName" -> "delta-core",
+    "deltaVersion" -> "2.4.0",
+  ),
+  "3.5.0" -> Map(
+    "sparkTestingBaseVersion" -> "3.5.0_1.4.7",
+    "deltaName" -> "delta-spark",
+    "deltaVersion" -> "3.0.0",
+  ),
+)
+
+val sparkVersion = System.getenv("SPARK_VERSION")
+val sparkTestingBaseVersion = sparkVersionMap(sparkVersion)("sparkTestingBaseVersion")
+val deltaName = sparkVersionMap(sparkVersion)("deltaName")
+val deltaVersion = sparkVersionMap(sparkVersion)("deltaVersion")
 val beamVersion = "2.33.0"
 
 libraryDependencies ++= Seq(
     "com.fasterxml.jackson.module" % "jackson-module-paranamer" % "2.12.1",
     "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.12.1",
     "com.google.cloud.spark" %% "spark-bigquery-with-dependencies" % "0.21.1",
-    "com.zeotap" %% "spark-property-tests" % "3.1.2",
-    "io.delta" %% "delta-core" % "1.0.1",
+    "com.zeotap" %% "spark-property-tests" % sparkVersion,
+    "io.delta" %% deltaName % deltaVersion,
     "mysql" % "mysql-connector-java" % "8.0.26",
     "org.apache.beam" % "beam-runners-direct-java" % beamVersion,
     "org.apache.beam" % "beam-sdks-java-core" % beamVersion,
@@ -32,6 +63,10 @@ libraryDependencies ++= Seq(
     "org.mockito" % "mockito-core" % "2.22.0" % Test,
     "org.testcontainers" % "mysql" % "1.16.0" % Test,
     "org.testcontainers" % "postgresql" % "1.16.0" % Test
+)
+
+dependencyOverrides ++= Seq(
+  "org.scalatest" %% "scalatest" % "3.0.9"
 )
 
 fork in Test := true

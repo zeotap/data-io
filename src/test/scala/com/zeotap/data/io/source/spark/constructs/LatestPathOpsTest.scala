@@ -21,6 +21,7 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    FileUtils.forceDelete(new File("src/test/resources/custom-input-format"))
 
     val testSchema = List(
       StructField("Common_DataPartnerID", IntegerType, true),
@@ -155,7 +156,7 @@ class LatestPathOpsTest extends FunSuite with DataFrameSuiteBase {
     )
     val actualPathsForPattern = LatestPathOps.getPathsForPattern(fileSystem, fullPathTemplate).map(x => x.toString).map(x => "src" + x.split("src")(1)).toList
 
-    assert(expectedPathsForPattern == actualPathsForPattern)
+    assert(expectedPathsForPattern.sorted == actualPathsForPattern.sorted)
     FileUtils.forceDelete(new File("src/test/resources/custom-input-format/yr=2021/mon=07/dt=20"))
     FileUtils.forceDelete(new File("src/test/resources/custom-input-format/yr=2021/mon=07/dt=21"))
   }

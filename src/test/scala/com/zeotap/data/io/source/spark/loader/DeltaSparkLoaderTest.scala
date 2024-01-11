@@ -15,6 +15,8 @@ class DeltaSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
     val inputDeltaPath2: String = "src/test/resources/custom-input-format/yr=2023/mon=02/dt=02"
 
     override def beforeAll(): Unit = {
+        System.setProperty("spark.sql.extensions", "io.delta.sql.DeltaSparkSessionExtension")
+        System.setProperty("spark.sql.catalog.spark_catalog", "org.apache.spark.sql.delta.catalog.DeltaCatalog")
         super.beforeAll()
 
         val testSchema = List(
