@@ -20,6 +20,7 @@ class LookBackOpsTest extends FunSuite with DataFrameSuiteBase {
 
   override def beforeAll(): Unit = {
     super.beforeAll()
+    FileUtils.forceDelete(new File("src/test/resources/custom-input-format"))
 
     val testSchema = List(
       StructField("Common_DataPartnerID", IntegerType, true),
