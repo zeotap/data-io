@@ -33,6 +33,7 @@ object SparkInterpreters {
         case StringType(stringType) => dataFrameReader.option("stringtype", stringType)
         case Query(query) => dataFrameReader.option("query", query)
         case CustomSchema(schema) => dataFrameReader.option("customSchema", schema)
+        case Version(version) => dataFrameReader.option("versionAsOf", version)
         case _ => dataFrameReader
       }
       reader.asInstanceOf[A]

@@ -43,6 +43,9 @@ object SupportedFeatures {
 
   final case class CustomSchema[A](schema: String) extends SupportedFeatures[A]
 
+  // Delta Lake Reader-specific features
+  final case class Version[A](version: Long) extends SupportedFeatures[A]
+
   // Loader-specific features
   final case class Load[A]() extends SupportedFeatures[A]
 

@@ -2,8 +2,10 @@ package com.zeotap.data.io.source.spark.loader
 
 import com.holdenkarau.spark.testing.DataFrameSuiteBase
 import com.zeotap.data.io.common.test.helpers.DataFrameUtils.assertDataFrameEquality
+import io.delta.tables.DeltaTable
 import org.apache.commons.io.FileUtils
 import org.apache.spark.sql.Row
+import org.apache.spark.sql.functions.lit
 import org.apache.spark.sql.types.{IntegerType, StringType, StructField, StructType}
 import org.scalatest.FunSuite
 
@@ -113,5 +115,42 @@ class DeltaSparkLoaderTest extends FunSuite with DataFrameSuiteBase {
             .buildUnsafe(spark)
 
         assertDataFrameEquality(expectedDf, df, "DeviceId")
+    }
+
+    test("testForVersion") {
+        val deltaTable = DeltaTable.forPath(inputDeltaPath1)
+        deltaTable.update(Map("Common_DataPartnerID" -> lit(2)))
+
+        val expectedSchema = List(
+            StructField("Common_DataPartnerID", IntegerType, true),
+            StructField("DeviceId", StringType, true),
+            StructField("Demographic_Country", StringType, true),
+            StructField("Common_TS", StringType, true)
+        )
+
+        val expectedDf1 = spark.createDataFrame(
+            spark.sparkContext.parallelize(Seq(
+                Row(1, "1", "India", "1504679559"),
+                Row(1, "2", "India", "1504679359"),
+                Row(1, "3", "Spain", "1504679459"),
+                Row(1, "4", "India", "1504679659")
+            )),
+            StructType(expectedSchema)
+        )
+
+        val df1 = DeltaSparkLoader()
+            .version(0)
+            .load(inputDeltaPath1)
+            .buildUnsafe(spark)
+
+        val expectedDf2 = deltaTable.toDF
+
+        val df2 = DeltaSparkLoader()
+            .version(1)
+            .load(inputDeltaPath1)
+            .buildUnsafe(spark)
+
+        assertDataFrameEquality(expectedDf1, df1, "DeviceId")
+        assertDataFrameEquality(expectedDf2, df2, "DeviceId")
     }
 }
