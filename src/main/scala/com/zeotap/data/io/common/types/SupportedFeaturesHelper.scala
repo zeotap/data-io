@@ -64,4 +64,6 @@ object SupportedFeaturesHelper {
 
   def compression[A](compression: String): SupportedFeaturesF[A] = liftF(Compression[A](compression))
 
+  def version[A](version: Long): SupportedFeaturesF[A] = liftF(Version[A](version))
+
 }

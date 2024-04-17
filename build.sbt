@@ -3,7 +3,7 @@ name := "data-io"
 organization := "com.zeotap"
 
 scalaVersion := "2.12.14"
-version := sys.env("SPARK_VERSION").asInstanceOf[String] + "_2.0.0"
+version := sys.env("SPARK_VERSION").asInstanceOf[String] + "_2.0.1"
 
 import ReleaseTransformations._
 
@@ -71,7 +71,7 @@ dependencyOverrides ++= Seq(
 
 fork in Test := true
 
-javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled")
+javaOptions ++= Seq("-Xms512M", "-Xmx2048M", "-XX:MaxPermSize=2048M", "-XX:+CMSClassUnloadingEnabled", "-Dspark.sql.extensions=io.delta.sql.DeltaSparkSessionExtension", "-Dspark.sql.catalog.spark_catalog=org.apache.spark.sql.delta.catalog.DeltaCatalog")
 
 parallelExecution in Test := false
 

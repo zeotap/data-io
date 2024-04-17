@@ -10,4 +10,10 @@ case class DeltaSparkLoader(
     dataFrameProperties: Seq[SupportedFeaturesF[DataFrame]] = Seq()
 ) extends FSSparkLoader(readerProperties, readerToDataFrameProperties, dataFrameProperties) {
 
+  /**
+   * Version of the Delta table to be read
+   */
+  def version(version: Long): DeltaSparkLoader =
+    DeltaSparkLoader(readerProperties :+ SupportedFeaturesHelper.version(version), readerToDataFrameProperties, dataFrameProperties)
+
 }
