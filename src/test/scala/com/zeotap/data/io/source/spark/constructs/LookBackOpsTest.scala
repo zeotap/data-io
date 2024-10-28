@@ -17,6 +17,7 @@ class LookBackOpsTest extends FunSuite with DataFrameSuiteBase {
   val inputAvroPath1 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=19"
   val inputAvroPath2 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=18"
   val inputAvroPath3 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=17"
+  val inputAvroPath4 : String = "src/test/resources/custom-input-format/yr=2021/mon=07/dt=25/abc"
 
   override def beforeAll(): Unit = {
     super.beforeAll()
@@ -79,6 +80,7 @@ class LookBackOpsTest extends FunSuite with DataFrameSuiteBase {
     )
 
     sampleDf3.write.format("avro").save(inputAvroPath3)
+    sampleDf3.write.format("avro").save(inputAvroPath4)
   }
 
   override def afterAll(): Unit = {
@@ -86,6 +88,7 @@ class LookBackOpsTest extends FunSuite with DataFrameSuiteBase {
     FileUtils.forceDelete(new File(inputAvroPath1))
     FileUtils.forceDelete(new File(inputAvroPath2))
     FileUtils.forceDelete(new File(inputAvroPath3))
+    FileUtils.forceDelete(new File(inputAvroPath4))
   }
 
   test("getLocalDateTimeFromStandardParametersTest for yr,mon,dt") {
@@ -156,6 +159,17 @@ class LookBackOpsTest extends FunSuite with DataFrameSuiteBase {
     val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "21")
 
     val expectedDataFrame = spark.read.format("avro").load(List(inputAvroPath1, inputAvroPath2) : _*)
+    import com.zeotap.data.io.source.spark.constructs.DataFrameReaderOps._
+    val actualDataFrame = spark.read.format("avro").lookBack(pathTemplate, parameters, 3)
+
+    assertDataFrameEquality(expectedDataFrame, actualDataFrame, "DeviceId")
+  }
+
+  test("lookBackReadTest2") {
+    val pathTemplate = "src/test/resources/custom-input-format/yr=${YR}/mon=${MON}/dt=${DT}/*"
+    val parameters = Map("YR" -> "2021", "MON" -> "07", "DT" -> "26")
+
+    val expectedDataFrame = spark.read.format("avro").load(List(inputAvroPath4): _*)
     import com.zeotap.data.io.source.spark.constructs.DataFrameReaderOps._
     val actualDataFrame = spark.read.format("avro").lookBack(pathTemplate, parameters, 3)
 

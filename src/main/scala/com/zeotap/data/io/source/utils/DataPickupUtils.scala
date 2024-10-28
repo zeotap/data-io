@@ -11,8 +11,14 @@ object DataPickupUtils {
   def getFileSystem(pathTemplate: String): FileSystem =
     new Path(pathTemplate).getFileSystem(new Configuration)
 
-  def pathExists(path: String, fs: FileSystem): Boolean =
-    fs.exists(new Path(path))
+  def pathExists(path: String, fs: FileSystem): Boolean = {
+    if (path.endsWith("*")) {
+      val parentPath = path.substring(0, path.lastIndexOf("/"))
+      fs.exists(new Path(parentPath))
+    } else {
+      fs.exists(new Path(path))
+    }
+  }
 
   def populatePathTemplateWithParameters(pathTemplate: String, parameters: Map[String, String]): String =
     new StringSubstitutor(JavaConversions.mapAsJavaMap(parameters)).replace(pathTemplate)

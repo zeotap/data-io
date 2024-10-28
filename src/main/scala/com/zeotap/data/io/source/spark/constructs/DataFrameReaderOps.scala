@@ -20,6 +20,7 @@ object DataFrameReaderOps {
       val possiblePaths = getAllPossiblePaths(pathTemplate, parameters, lookBackWindow)
       val fileSystem = DataPickupUtils.getFileSystem(pathTemplate)
       val pathsToPick = LookBackOps.getPathsToPick(possiblePaths, fileSystem)
+      println(pathsToPick)
       safeReadMultiPath(pathsToPick)
     }
 
